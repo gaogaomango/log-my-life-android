@@ -1,15 +1,18 @@
 package jp.co.mo.logmylife.login;
 
 import android.content.Intent;
+import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -21,11 +24,15 @@ import jp.co.mo.logmylife.main.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = LoginActivity.class.getSimpleName();
+
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    private CallbackManager callbackManager;
+
     private Button createUserButton;
-    private Button loginUserBotton;
+    private Button loginUserButton;
 
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -75,8 +82,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-        loginUserBotton = findViewById(R.id.login_user_button);
-        loginUserBotton.setOnClickListener(new View.OnClickListener() {
+        loginUserButton = findViewById(R.id.login_user_button);
+        loginUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO: validation
@@ -95,6 +102,37 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        FingerprintManager fm = (FingerprintManager) getSystemService(FINGERPRINT_SERVICE);
+        try {
+            if (fm.isHardwareDetected() && fm.hasEnrolledFingerprints()) {
+                fm.authenticate(null,
+                        null,
+                        0,
+                        new FingerprintManager.AuthenticationCallback() {
+                            @Override
+                            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                                Log.e(TAG, "ERROR: " + errorCode + ":" + errString);
+                                Toast.makeText(LoginActivity.this, "Sorry, could not recgnize your finger print. " + errString, Toast.LENGTH_LONG);
+                            }
+
+                            @Override
+                            public void onAuthenticationFailed() {
+                                Log.i(TAG, "Failed");
+                                Toast.makeText(LoginActivity.this, "Sorry, could not recgnize your finger print. Please try again.", Toast.LENGTH_LONG);
+                            }
+
+                            @Override
+                            public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                                Toast.makeText(LoginActivity.this, "Login succeeded!", Toast.LENGTH_LONG);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                            }
+                        }, null);
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

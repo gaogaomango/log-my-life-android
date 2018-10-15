@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LogMyLife</string>
+    <string name="menu_map">Map Activity</string>
+    <string name="logout">Logout</string>
 </resources>

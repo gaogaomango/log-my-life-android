@@ -10,12 +10,15 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.login.LoginActivity;
+import jp.co.mo.logmylife.map.MapActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
     private Button logoutButton;
+
+    private Button menuMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+        menuMap = findViewById(R.id.menu_map);
+        menuMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
             }
         });
     }
