@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -26,14 +27,14 @@
             <!--android:name="com.facebook.sdk.AutoLogAppEventsEnabled"-->
             <!--android:value="false" />-->
 
-        <activity android:name=".login.LoginActivity">
+        <activity android:name=".presentation.view.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".main.MainActivity" />
+        <activity android:name=".presentation.view.main.MainActivity" />
         <!--<activity-->
             <!--android:name="com.facebook.FacebookActivity"-->
             <!--android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"-->
@@ -50,7 +51,7 @@
                 <!--<data android:scheme="@string/fb_login_protocol_scheme" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
-        <activity android:name=".map.MapActivity"></activity>
+        <activity android:name=".presentation.view.map.MapActivity"></activity>
     </application>
 
 </manifest>

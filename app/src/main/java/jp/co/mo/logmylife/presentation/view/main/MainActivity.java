@@ -1,18 +1,18 @@
-package jp.co.mo.logmylife.main;
+package jp.co.mo.logmylife.presentation.view.main;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
-import jp.co.mo.logmylife.login.LoginActivity;
-import jp.co.mo.logmylife.map.MapActivity;
+import jp.co.mo.logmylife.presentation.view.login.LoginActivity;
+import jp.co.mo.logmylife.presentation.view.map.MapActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AbstractBaseActivity {
 
     private FirebaseAuth mAuth;
 

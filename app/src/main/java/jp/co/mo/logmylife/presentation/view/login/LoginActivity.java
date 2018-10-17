@@ -1,9 +1,8 @@
-package jp.co.mo.logmylife.login;
+package jp.co.mo.logmylife.presentation.view.login;
 
 import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,10 +18,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
-import jp.co.mo.logmylife.main.MainActivity;
+import jp.co.mo.logmylife.presentation.view.main.MainActivity;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AbstractBaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
