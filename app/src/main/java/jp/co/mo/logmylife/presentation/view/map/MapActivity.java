@@ -12,15 +12,17 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,12 +30,15 @@ import java.util.Locale;
 
 import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
-import jp.co.mo.logmylife.common.CopyDialog;
+import jp.co.mo.logmylife.common.util.CopyDialog;
+import jp.co.mo.logmylife.common.util.Logger;
+import jp.co.mo.logmylife.domain.entity.map.InfoWindowData;
 
 public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMarkerClickListener,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
-        OnMapReadyCallback{
+        OnMapReadyCallback,
+        LocationListener{
 
     private static final String TAG = MapActivity.class.getSimpleName();
 
@@ -43,12 +48,12 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     private static final float MIN_DISTANCE = 1000;
 
     private LocationManager mLocationManager;
-    private LocationListener mLocationListener;
 
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate");
         setContentView(R.layout.activity_map);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -56,33 +61,10 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         mapFragment.getMapAsync(this);
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        mLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location != null) {
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-                    mMap.animateCamera(cameraUpdate);
-                    mLocationManager.removeUpdates(this);
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                MIN_TIME,
+                MIN_DISTANCE,
+                this);
     }
 
 
@@ -99,7 +81,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     @Override
     protected void onPause() {
         super.onPause();
-        mLocationManager.removeUpdates(mLocationListener);
+        mLocationManager.removeUpdates(this);
     }
 
     @Override
@@ -114,22 +96,51 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
                 showAddressDialog(latLng.latitude, latLng.longitude);
             }
         });
+
+//        // TODO: get info from API(DB).
+//        LatLng snowqualmie = new LatLng(47.5287132, -121.8253906);
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(snowqualmie)
+//                .title("Snowqualmie Falls")
+//                .snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+//
+//        InfoWindowData info = new InfoWindowData();
+//        info.setImage("snowqualmie");
+//        info.setHotel("Hotel : excellent hotels available");
+//        info.setFood("Food : all types of restaurants available");
+//        info.setTransport("Reach the site by bus, car and train.");
+//
+//        CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
+//        mMap.setInfoWindowAdapter(customInfoWindow);
+//
+//        Marker m = mMap.addMarker(markerOptions);
+//        m.setTag(info);
+//        m.showInfoWindow();
+//
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        // Retrieve the data from the marker.
-        Integer clickCount = (Integer) marker.getTag();
+        Log.e(TAG, "onMarkerClick");
+        InfoWindowData data = (InfoWindowData) marker.getTag();
+        if(data != null) {
+            InfoWindowData info = new InfoWindowData();
+            info.setImage(data.getImage());
+            info.setHotel(data.getHotel());
+            info.setFood(data.getFood());
+            info.setTransport(data.getTransport());
+            MapInfoDialog dialog = new MapInfoDialog(this, info);
+            dialog.show();
 
-        // Check if a click count was set, then display the click count.
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-            Toast.makeText(this,
-                    marker.getTitle() +
-                            " has been clicked " + clickCount + " times.",
-                    Toast.LENGTH_SHORT).show();
+
+            Logger.debug(TAG, "data.getTransport()" + data.getTransport());
+            Logger.debug(TAG, "data.getFood()" + data.getFood());
+            Logger.debug(TAG, "data.getHotel()" + data.getHotel());
+            Logger.debug(TAG, "data.getImage()" + data.getImage());
         }
+
         return false;
     }
 
@@ -173,5 +184,52 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+            mMap.animateCamera(cameraUpdate);
+            mLocationManager.removeUpdates(this);
+
+            // TODO: do in MapReady(get from API(DB)).
+            LatLng snowqualmie = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(snowqualmie)
+                    .title("Snowqualmie Falls")
+                    .snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+            InfoWindowData info = new InfoWindowData();
+            info.setImage("snowqualmie");
+            info.setHotel("Hotel : excellent hotels available");
+            info.setFood("Food : all types of restaurants available");
+            info.setTransport("Reach the site by bus, car and train.");
+            MapInfoDialog dialog = new MapInfoDialog(this, info);
+            dialog.show();
+
+            Marker m = mMap.addMarker(markerOptions);
+            m.setTag(info);
+//            m.showInfoWindow();
+
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

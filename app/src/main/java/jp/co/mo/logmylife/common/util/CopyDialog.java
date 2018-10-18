@@ -1,4 +1,4 @@
-package jp.co.mo.logmylife.common;
+package jp.co.mo.logmylife.common.util;
 
 import android.app.Activity;
 import android.app.Dialog;
