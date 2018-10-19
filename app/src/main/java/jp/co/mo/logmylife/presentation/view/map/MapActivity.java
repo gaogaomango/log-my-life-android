@@ -37,6 +37,7 @@ import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMarkerClickListener,
         GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener,
+        GoogleMap.OnMapLongClickListener,
         OnMapReadyCallback,
         LocationListener{
 
@@ -91,12 +92,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         checkMapPermission();
 
         mMap.setOnMarkerClickListener(this);
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                showAddressDialog(latLng.latitude, latLng.longitude);
-            }
-        });
+        mMap.setOnMapLongClickListener(this);
 
         List<MapPlaceData> mapPlaceDataList = mapUseCase.getMapPlaceDatas(this);
         if(mapPlaceDataList != null) {
@@ -147,12 +143,19 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         Log.e(TAG, "onMarkerClick");
         MapPlaceData data = (MapPlaceData) marker.getTag();
         if(data != null) {
-            MapPlaceData info = new MapPlaceData();
-//            info.setImage(data.getImage());
-//            info.setHotel(data.getHotel());
-//            info.setFood(data.getFood());
-//            info.setTransport(data.getTransport());
-            MapInfoDialog dialog = new MapInfoDialog(this, info);
+            MapPlaceData placeData = new MapPlaceData();
+            placeData.setId(data.getId());
+            placeData.setUserId(data.getUserId());
+            placeData.setTitle(data.getTitle());
+            placeData.setLat(data.getLat());
+            placeData.setLng(data.getLng());
+            placeData.setTypeId(data.getTypeId());
+            placeData.setTypeDetailId(data.getTypeDetailId());
+            placeData.setUrl(data.getUrl());
+            placeData.setDetail(data.getDetail());
+            placeData.setCreateDate(data.getCreateDate());
+            placeData.setUpdateDate(data.getUpdateDate());
+            MapInfoDialog dialog = new MapInfoDialog(this, placeData);
             dialog.show();
         }
 
@@ -224,5 +227,37 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+            LatLng snowqualmie = new LatLng(latLng.latitude, latLng.longitude);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(snowqualmie)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+        MapPlaceData info = new MapPlaceData();
+        Marker m = mMap.addMarker(markerOptions);
+        m.setTag(info);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
+
+
+
+        MapPlaceData placeData = new MapPlaceData();
+//        placeData.setId(data.getId());
+//        placeData.setUserId(data.getUserId());
+//        placeData.setTitle(data.getTitle());
+//        placeData.setLat(data.getLat());
+//        placeData.setLng(data.getLng());
+//        placeData.setTypeId(data.getTypeId());
+//        placeData.setTypeDetailId(data.getTypeDetailId());
+//        placeData.setUrl(data.getUrl());
+//        placeData.setDetail(data.getDetail());
+//        placeData.setCreateDate(data.getCreateDate());
+//        placeData.setUpdateDate(data.getUpdateDate());
+        MapInfoDialog dialog = new MapInfoDialog(this, placeData);
+        dialog.show();
+
+//        showAddressDialog(latLng.latitude, latLng.longitude);
     }
 }

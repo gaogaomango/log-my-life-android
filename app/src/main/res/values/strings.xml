@@ -2,6 +2,13 @@
     <string name="app_name">LogMyLife</string>
     <string name="menu_map">Map Activity</string>
     <string name="logout">Logout</string>
+    <string name="dialog_title">TITLE</string>
+    <string name="dialog_type">TYPE</string>
+    <string name="dialog_type_detail">RESTAURANT_TYPE</string>
+    <string name="url">URL</string>
+    <string name="detail">DETAIL</string>
+
+
     <string name="dialog_copy">copy</string>
     <string name="dialog_exit">exit</string>
     <string name="create_date">create_date</string>

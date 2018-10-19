@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,7 +21,6 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
     private static final String TAG = MapInfoDialog.class.getSimpleName();
 
-    private Activity mActivity;
     private MapPlaceData mMapPlaceData;
     @BindView(R.id.title) EditText title;
     @BindView(R.id.type) EditText type;
@@ -34,7 +34,6 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
     public MapInfoDialog(Activity activity, MapPlaceData mapPlaceData) {
         super(activity);
-        this.mActivity = activity;
         this.mMapPlaceData = mapPlaceData;
     }
 
@@ -44,6 +43,10 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.map_custom_infowindow);
         ButterKnife.bind(this);
+
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
 
         if(mMapPlaceData != null) {
             title.setText(mMapPlaceData.getTitle());
@@ -71,6 +74,7 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
                 break;
             case R.id.update_place_info:
                 // TODO: update using api.
+                updateData();
                 changeInfoUpdateStatus(false);
                 break;
             default:
