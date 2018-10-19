@@ -4,4 +4,6 @@
     <string name="logout">Logout</string>
     <string name="dialog_copy">copy</string>
     <string name="dialog_exit">exit</string>
+    <string name="create_date">create_date</string>
+    <string name="update_date">update_date</string>
 </resources>

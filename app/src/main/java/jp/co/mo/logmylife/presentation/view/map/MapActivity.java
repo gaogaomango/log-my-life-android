@@ -31,8 +31,8 @@ import java.util.Locale;
 import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.CopyDialog;
-import jp.co.mo.logmylife.common.util.Logger;
-import jp.co.mo.logmylife.domain.entity.map.InfoWindowData;
+import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
+import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
 public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMarkerClickListener,
         GoogleMap.OnMyLocationButtonClickListener,
@@ -42,12 +42,12 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     private static final String TAG = MapActivity.class.getSimpleName();
 
-    private GoogleMap mMap;
-
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
 
+    private GoogleMap mMap;
     private LocationManager mLocationManager;
+    private MapUseCaseImpl mapUseCase;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -65,6 +65,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
                 MIN_TIME,
                 MIN_DISTANCE,
                 this);
+        mapUseCase = new MapUseCaseImpl();
     }
 
 
@@ -97,6 +98,26 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             }
         });
 
+        List<MapPlaceData> mapPlaceDataList = mapUseCase.getMapPlaceDatas(this);
+        if(mapPlaceDataList != null) {
+            for (MapPlaceData data : mapPlaceDataList) {
+                if(data == null) {
+                    continue;
+                }
+
+                LatLng latLng = new LatLng(data.getLat(), data.getLng());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng)
+                        .title(data.getTitle())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+                Marker m = mMap.addMarker(markerOptions);
+                m.setTag(data);
+
+            }
+        }
+
+
 //        // TODO: get info from API(DB).
 //        LatLng snowqualmie = new LatLng(47.5287132, -121.8253906);
 //        MarkerOptions markerOptions = new MarkerOptions();
@@ -105,7 +126,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 //                .snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
 //                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 //
-//        InfoWindowData info = new InfoWindowData();
+//        MapPlaceData info = new MapPlaceData();
 //        info.setImage("snowqualmie");
 //        info.setHotel("Hotel : excellent hotels available");
 //        info.setFood("Food : all types of restaurants available");
@@ -124,21 +145,15 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.e(TAG, "onMarkerClick");
-        InfoWindowData data = (InfoWindowData) marker.getTag();
+        MapPlaceData data = (MapPlaceData) marker.getTag();
         if(data != null) {
-            InfoWindowData info = new InfoWindowData();
-            info.setImage(data.getImage());
-            info.setHotel(data.getHotel());
-            info.setFood(data.getFood());
-            info.setTransport(data.getTransport());
+            MapPlaceData info = new MapPlaceData();
+//            info.setImage(data.getImage());
+//            info.setHotel(data.getHotel());
+//            info.setFood(data.getFood());
+//            info.setTransport(data.getTransport());
             MapInfoDialog dialog = new MapInfoDialog(this, info);
             dialog.show();
-
-
-            Logger.debug(TAG, "data.getTransport()" + data.getTransport());
-            Logger.debug(TAG, "data.getFood()" + data.getFood());
-            Logger.debug(TAG, "data.getHotel()" + data.getHotel());
-            Logger.debug(TAG, "data.getImage()" + data.getImage());
         }
 
         return false;
@@ -193,28 +208,6 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
             mMap.animateCamera(cameraUpdate);
             mLocationManager.removeUpdates(this);
-
-            // TODO: do in MapReady(get from API(DB)).
-            LatLng snowqualmie = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(snowqualmie)
-                    .title("Snowqualmie Falls")
-                    .snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-
-            InfoWindowData info = new InfoWindowData();
-            info.setImage("snowqualmie");
-            info.setHotel("Hotel : excellent hotels available");
-            info.setFood("Food : all types of restaurants available");
-            info.setTransport("Reach the site by bus, car and train.");
-            MapInfoDialog dialog = new MapInfoDialog(this, info);
-            dialog.show();
-
-            Marker m = mMap.addMarker(markerOptions);
-            m.setTag(info);
-//            m.showInfoWindow();
-
         }
     }
 
