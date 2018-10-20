@@ -194,7 +194,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         if (location != null) {
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-            mMap.animateCamera(cameraUpdate);
+            mMap.moveCamera(cameraUpdate);
             mLocationManager.removeUpdates(this);
         }
     }

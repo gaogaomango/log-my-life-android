@@ -79,7 +79,7 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
             if(mMapPlaceData.getTypeId() != null) {
                 type.setSelection(mMapPlaceData.getTypeId());
                 if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
-                        || MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id))) {
+                        || (mDataTypeSelected != null && mDataTypeSelected.id != null && MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id)))) {
                     typeDetailTitle.setVisibility(View.VISIBLE);
                     typeDetail.setVisibility(View.VISIBLE);
                 }
