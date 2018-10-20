@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 public class MapPlaceData {
 
-    private int id;
+    private Integer id;
     private String userId;
     private String title;
     private List<MapPlacePicData> picList;

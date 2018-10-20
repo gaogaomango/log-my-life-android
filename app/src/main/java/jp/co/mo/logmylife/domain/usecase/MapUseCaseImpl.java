@@ -13,8 +13,18 @@ public class MapUseCaseImpl extends AbstractUseCase implements MapUseCase {
 
     @Override
     public List<MapPlaceData> getMapPlaceDatas(Context context) {
-        mapRepository = new MapRepository();
+        if(mapRepository == null) {
+            mapRepository = new MapRepository();
+        }
         return mapRepository.getInfoWindowDatas(context);
+    }
+
+    @Override
+    public void saveMapPlaceData(Context context, MapPlaceData placeData) {
+        if(mapRepository == null) {
+            mapRepository = new MapRepository();
+        }
+        mapRepository.saveInfoWindowData(context, placeData);
     }
 
 }

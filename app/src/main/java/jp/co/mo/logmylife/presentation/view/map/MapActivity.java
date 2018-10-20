@@ -25,12 +25,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.CopyDialog;
+import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
@@ -155,7 +158,8 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             placeData.setDetail(data.getDetail());
             placeData.setCreateDate(data.getCreateDate());
             placeData.setUpdateDate(data.getUpdateDate());
-            MapInfoDialog dialog = new MapInfoDialog(this, placeData);
+
+            MapInfoDialog dialog = new MapInfoDialog(this, placeData, marker);
             dialog.show();
         }
 
@@ -231,33 +235,30 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-            LatLng snowqualmie = new LatLng(latLng.latitude, latLng.longitude);
+        LatLng snowqualmie = new LatLng(latLng.latitude, latLng.longitude);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(snowqualmie)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
-        MapPlaceData info = new MapPlaceData();
+        MapPlaceData placeData = new MapPlaceData();
+        placeData.setLat(latLng.latitude);
+        placeData.setLng(latLng.longitude);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
+            String date = sdf.format(new Date());
+            placeData.setCreateDate(date);
+            placeData.setUpdateDate(date);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
         Marker m = mMap.addMarker(markerOptions);
-        m.setTag(info);
+        m.setTag(placeData);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
 
-
-
-        MapPlaceData placeData = new MapPlaceData();
-//        placeData.setId(data.getId());
-//        placeData.setUserId(data.getUserId());
-//        placeData.setTitle(data.getTitle());
-//        placeData.setLat(data.getLat());
-//        placeData.setLng(data.getLng());
-//        placeData.setTypeId(data.getTypeId());
-//        placeData.setTypeDetailId(data.getTypeDetailId());
-//        placeData.setUrl(data.getUrl());
-//        placeData.setDetail(data.getDetail());
-//        placeData.setCreateDate(data.getCreateDate());
-//        placeData.setUpdateDate(data.getUpdateDate());
-        MapInfoDialog dialog = new MapInfoDialog(this, placeData);
+        MapInfoDialog dialog = new MapInfoDialog(this, placeData, m);
         dialog.show();
-
-//        showAddressDialog(latLng.latitude, latLng.longitude);
     }
 }

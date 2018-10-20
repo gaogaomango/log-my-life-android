@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 public enum RestaurantType {
 
+    NO_VALUE(-1, ""),
     JAPANESE(1, "JAPANESE"),
     CHINESE(2, "CHINESE"),
     KOREAN(3, "KOREAN"),
@@ -12,15 +13,15 @@ public enum RestaurantType {
     MEXICAN(6, "MEXICAN"),
     THAI_FOOD(7, "THAI");
 
-    private int id;
+    private Integer id;
     private String type;
 
-    RestaurantType(int id, String type) {
+    RestaurantType(Integer id, String type) {
         this.id = id;
         this.type = type;
     }
 
-    public int getId(){
+    public Integer getId(){
         return this.id;
     }
 
@@ -28,13 +29,13 @@ public enum RestaurantType {
         return this.type;
     }
 
-    public static RestaurantType getById(int id) {
+    public static RestaurantType getById(Integer id) {
         for(RestaurantType r : RestaurantType.values()) {
-            if(id == r.getId()) {
+            if(id.intValue() == r.getId().intValue()) {
                 return r;
             }
         }
-        return null;
+        return NO_VALUE;
     }
 
     public static RestaurantType getByType(String type) {
@@ -46,7 +47,7 @@ public enum RestaurantType {
                 return r;
             }
         }
-        return null;
+        return NO_VALUE;
     }
 
 }

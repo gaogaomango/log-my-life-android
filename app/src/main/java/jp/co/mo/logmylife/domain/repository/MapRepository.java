@@ -11,10 +11,12 @@ import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
 
 public class MapRepository {
 
-    private MapDataTableHelper mapDataTableHelper;
+    private MapDataTableHelper mapDataTableHelper = null;
 
     public List<MapPlaceData> getInfoWindowDatas(Context context) {
-        mapDataTableHelper = new MapDataTableHelper(context);
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
         List<MapPlaceData> list = readMapData();
 
         // TODO: picの情報も取り入れる事。
@@ -29,9 +31,9 @@ public class MapRepository {
                 MapDataTableHelper.TABLE_NAME,
         new String[]{MapDataTableHelper.COLUMN_NAME_USER_ID,
                 MapDataTableHelper.COLUMN_NAME_TITLE,
-                MapDataTableHelper.COLUMN_NAME_TYPE_ID,
                 MapDataTableHelper.COLUMN_NAME_LAT,
                 MapDataTableHelper.COLUMN_NAME_LNG,
+                MapDataTableHelper.COLUMN_NAME_TYPE_ID,
                 MapDataTableHelper.COLUMN_NAME_TYPE_DETAIL_ID,
                 MapDataTableHelper.COLUMN_NAME_URL,
                 MapDataTableHelper.COLUMN_NAME_DETAIL,
@@ -67,4 +69,20 @@ public class MapRepository {
 
         return list;
     }
+
+    public void saveInfoWindowData(Context context, MapPlaceData placeData) {
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
+
+        saveMapData(placeData);
+        // TODO: picの情報もsaveする事。
+    }
+
+    private void saveMapData(MapPlaceData placeData) {
+        SQLiteDatabase db = mapDataTableHelper.getWritableDatabase();
+        mapDataTableHelper.saveData(db, null, placeData);
+    }
+
+
 }

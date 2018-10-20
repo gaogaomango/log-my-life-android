@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 public enum MapDataType {
 
+    NO_VALUE(-1, ""),
     RESTAURANT(1, "Restaurant"),
     SUPERMARKET(2, "Super Market"),
     AMUSEMENT_PARK(3, "Amusement Park"),
@@ -20,15 +21,15 @@ public enum MapDataType {
     FRIENDS(14, "Friends")
     ;
 
-    private int id;
+    private Integer id;
     private String type;
 
-    MapDataType(int id, String type) {
+    MapDataType(Integer id, String type) {
         this.id = id;
         this.type = type;
     }
 
-    public int getId(){
+    public Integer getId(){
         return this.id;
     }
 
@@ -36,13 +37,13 @@ public enum MapDataType {
         return this.type;
     }
 
-    public static MapDataType getById(int id) {
+    public static MapDataType getById(Integer id) {
         for(MapDataType r : MapDataType.values()) {
-            if(id == r.getId()) {
+            if(id.intValue() == r.getId().intValue()) {
                 return r;
             }
         }
-        return null;
+        return NO_VALUE;
     }
 
     public static MapDataType getByType(String type) {
@@ -54,7 +55,7 @@ public enum MapDataType {
                 return r;
             }
         }
-        return null;
+        return NO_VALUE;
     }
 
 }
