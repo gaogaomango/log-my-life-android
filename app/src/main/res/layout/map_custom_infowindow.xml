@@ -22,24 +22,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dialog_type"/>
-    <EditText
+    <Spinner
         android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"/>
+        app:layout_constraintTop_toBottomOf="@+id/dialog_type"/>
     <TextView
+        android:id="@+id/type_details_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_type_detail"/>
-    <EditText
+        android:text="@string/dialog_type_detail"
+        android:visibility="gone"/>
+    <Spinner
         android:id="@+id/type_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/type"/>
+        app:layout_constraintTop_toBottomOf="@+id/type"
+        android:visibility="gone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

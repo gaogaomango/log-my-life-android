@@ -34,6 +34,7 @@ import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.CopyDialog;
 import jp.co.mo.logmylife.common.util.DateUtil;
+import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
@@ -57,7 +58,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate");
+        Logger.debug(TAG, "onCreate");
         setContentView(R.layout.activity_map);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -91,6 +92,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Logger.debug(TAG, "onMapReady");
         mMap = googleMap;
         checkMapPermission();
 
@@ -115,35 +117,11 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
             }
         }
-
-
-//        // TODO: get info from API(DB).
-//        LatLng snowqualmie = new LatLng(47.5287132, -121.8253906);
-//        MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(snowqualmie)
-//                .title("Snowqualmie Falls")
-//                .snippet("Snoqualmie Falls is located 25 miles east of Seattle.")
-//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-//
-//        MapPlaceData info = new MapPlaceData();
-//        info.setImage("snowqualmie");
-//        info.setHotel("Hotel : excellent hotels available");
-//        info.setFood("Food : all types of restaurants available");
-//        info.setTransport("Reach the site by bus, car and train.");
-//
-//        CustomInfoWindowGoogleMap customInfoWindow = new CustomInfoWindowGoogleMap(this);
-//        mMap.setInfoWindowAdapter(customInfoWindow);
-//
-//        Marker m = mMap.addMarker(markerOptions);
-//        m.setTag(info);
-//        m.showInfoWindow();
-//
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Log.e(TAG, "onMarkerClick");
+        Logger.debug(TAG, "onMarkerClick");
         MapPlaceData data = (MapPlaceData) marker.getTag();
         if(data != null) {
             MapPlaceData placeData = new MapPlaceData();
@@ -167,6 +145,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     }
 
     private void checkMapPermission() {
+        Logger.debug(TAG, "checkMapPermission");
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -185,6 +164,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
+        Logger.debug(TAG, "onMyLocationClick");
         showAddressDialog(location.getLatitude(), location.getLongitude());
     }
 
@@ -210,6 +190,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     @Override
     public void onLocationChanged(Location location) {
+        Logger.debug(TAG, "onLocationChanged");
         if (location != null) {
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
@@ -235,6 +216,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     @Override
     public void onMapLongClick(LatLng latLng) {
+        Logger.debug(TAG, "onMapLongClick");
         LatLng snowqualmie = new LatLng(latLng.latitude, latLng.longitude);
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(snowqualmie)

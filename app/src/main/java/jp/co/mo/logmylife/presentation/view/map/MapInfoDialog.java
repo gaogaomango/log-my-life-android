@@ -7,17 +7,25 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.enums.MapDataType;
 import jp.co.mo.logmylife.common.enums.RestaurantType;
+import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
@@ -28,9 +36,14 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
     private Context mContext;
     private MapPlaceData mMapPlaceData;
     private Marker mMarker;
+
+    private MapDataTypeItem mDataTypeSelected;
+    private MapRestaurantTypeItem mRestaurantTypeSelected;
+
     @BindView(R.id.title) EditText title;
-    @BindView(R.id.type) EditText type;
-    @BindView(R.id.type_details) EditText typeDetail;
+    @BindView(R.id.type) Spinner type;
+    @BindView(R.id.type_details_title) TextView typeDetailTitle;
+    @BindView(R.id.type_details) Spinner typeDetail;
     @BindView(R.id.url) EditText url;
     @BindView(R.id.details) EditText details;
     @BindView(R.id.create_date) TextView createDate;
@@ -39,6 +52,8 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
     @BindView(R.id.update_place_info) Button updatePlaceInfo;
 
     private MapUseCaseImpl mMapUseCase = null;
+
+    HashMap<Integer, String> typeMap = null;
 
     public MapInfoDialog(Activity activity, MapPlaceData mapPlaceData, Marker marker) {
         super(activity);
@@ -56,15 +71,22 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
-        getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+        getWindow().setAttributes(params);
 
         if(mMapPlaceData != null) {
             title.setText(mMapPlaceData.getTitle());
+            setDataType(type);
             if(mMapPlaceData.getTypeId() != null) {
-                type.setText(MapDataType.getById(mMapPlaceData.getTypeId()).getType());
+                type.setSelection(mMapPlaceData.getTypeId());
+                if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
+                        || MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id))) {
+                    typeDetailTitle.setVisibility(View.VISIBLE);
+                    typeDetail.setVisibility(View.VISIBLE);
+                }
             }
+            setRestaurantType(typeDetail);
             if(mMapPlaceData.getTypeDetailId() != null) {
-                typeDetail.setText(RestaurantType.getById(mMapPlaceData.getTypeDetailId()).getType());
+                type.setSelection(mMapPlaceData.getTypeDetailId());
             }
             url.setText(mMapPlaceData.getUrl());
             details.setText(mMapPlaceData.getDetail());
@@ -75,6 +97,94 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
             changeInfoUpdateStatus(false);
         }
     }
+
+    private void setDataType(Spinner spinner) {
+        List<MapDataTypeItem> itemList = new ArrayList<>();
+        for (MapDataType m : MapDataType.values()) {
+            if(!m.equals(MapDataType.NO_VALUE)) {
+                itemList.add(new MapDataTypeItem(m.getId(), m.getType()));
+            }
+        }
+        ArrayAdapter<MapDataTypeItem> spinnerAdapter = new ArrayAdapter<>(this.mContext, android.R.layout.simple_spinner_item, itemList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent,
+                                       View view, int position, long id) {
+                MapDataTypeItem item = (MapDataTypeItem) parent.getItemAtPosition(position);
+                mDataTypeSelected = item;
+                if(MapDataType.RESTAURANT.equals(MapDataType.getById(((Integer)item.id).intValue()))) {
+                    typeDetailTitle.setVisibility(View.VISIBLE);
+                    typeDetail.setVisibility(View.VISIBLE);
+                } else {
+                    typeDetailTitle.setVisibility(View.GONE);
+                    typeDetail.setVisibility(View.GONE);
+                }
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                Logger.error(TAG, "onNothingSelected");
+            }
+        });
+    }
+
+    private static class MapDataTypeItem {
+        public Object id;
+        public String type;
+
+        public MapDataTypeItem(Object id, String type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
+    private void setRestaurantType(Spinner spinner) {
+        List<MapRestaurantTypeItem> itemList = new ArrayList<>();
+        for (RestaurantType r : RestaurantType.values()) {
+            if(!r.equals(RestaurantType.NO_VALUE)) {
+                itemList.add(new MapRestaurantTypeItem(r.getId(), r.getType()));
+            }
+        }
+        ArrayAdapter<MapRestaurantTypeItem> spinnerAdapter = new ArrayAdapter<>(this.mContext, android.R.layout.simple_spinner_item, itemList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent,
+                                       View view, int position, long id) {
+                MapRestaurantTypeItem item = (MapRestaurantTypeItem) parent.getItemAtPosition(position);
+                mRestaurantTypeSelected = item;
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+                Logger.error(TAG, "onNothingSelected");
+            }
+        });
+    }
+
+    private static class MapRestaurantTypeItem {
+        public Object id;
+        public String type;
+
+        public MapRestaurantTypeItem(Object id, String type) {
+            this.id = id;
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -108,8 +218,8 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         mMapPlaceData.setLat(mMapPlaceData.getLat());
         mMapPlaceData.setLng(mMapPlaceData.getLng());
         // TODO: 数字を選択式にする。
-        mMapPlaceData.setTypeId(1);
-        mMapPlaceData.setTypeDetailId(1);
+        mMapPlaceData.setTypeId((Integer)mDataTypeSelected.id);
+        mMapPlaceData.setTypeDetailId((Integer)mRestaurantTypeSelected.id);
         mMapPlaceData.setUrl(url.getText().toString());
         mMapPlaceData.setDetail(details.getText().toString());
         mMapPlaceData.setCreateDate(mMapPlaceData.getCreateDate());
