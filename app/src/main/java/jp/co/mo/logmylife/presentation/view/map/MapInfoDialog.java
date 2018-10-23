@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -11,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -19,7 +21,6 @@ import com.google.android.gms.maps.model.Marker;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,6 +36,10 @@ import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
     private static final String TAG = MapInfoDialog.class.getSimpleName();
+
+    private static final int PREV_BUTTON = 0;
+    private static final int NEXT_BUTTON = 1;
+
 
     private Context mContext;
     private MapPlaceData mMapPlaceData;
@@ -53,10 +58,11 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
     @BindView(R.id.update_date) TextView updateDate;
     @BindView(R.id.edit_place_info) Button editBtn;
     @BindView(R.id.update_place_info) Button updatePlaceInfo;
+    @BindView(R.id.pictures) ViewPager picsViewPager;
+    @BindView(R.id.prev_img) ImageView prevImg;
+    @BindView(R.id.next_img) ImageView nextImg;
 
     private MapUseCaseImpl mMapUseCase = null;
-
-    HashMap<Integer, String> typeMap = null;
 
     public MapInfoDialog(Activity activity, MapPlaceData mapPlaceData, Marker marker) {
         super(activity);
@@ -78,6 +84,13 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
         if(mMapPlaceData != null) {
             title.setText(mMapPlaceData.getTitle());
+            PicturesPagerAdapter picsPagerAdapter = new PicturesPagerAdapter(mContext);
+            picsViewPager.setAdapter(picsPagerAdapter);
+            prevImg.setClickable(true);
+            prevImg.setOnClickListener(onClickListener(PREV_BUTTON));
+            nextImg.setClickable(true);
+            nextImg.setOnClickListener(onClickListener(NEXT_BUTTON));
+
             setDataType(type);
             if(mMapPlaceData.getTypeId() != null) {
                 if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
@@ -189,6 +202,24 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         }
     }
 
+    private View.OnClickListener onClickListener(final int i) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (i == NEXT_BUTTON) {
+                    //next page
+                    if (picsViewPager.getCurrentItem() < picsViewPager.getAdapter().getCount() - 1) {
+                        picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() + 1);
+                    }
+                } else if(i == PREV_BUTTON){
+                    //previous page
+                    if (picsViewPager.getCurrentItem() > 0) {
+                        picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() - 1);
+                    }
+                }
+            }
+        };
+    }
 
     @Override
     public void onClick(View v) {

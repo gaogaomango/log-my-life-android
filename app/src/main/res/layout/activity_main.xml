@@ -4,21 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:gravity="center"
-    tools:context=".main.MainActivity">
-
-    <Button
+    android:weightSum="7"
+    tools:context=".presentation.view.main.MainActivity">
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/menu_map"
-        android:id="@+id/menu_map"
-        />
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+    </LinearLayout>
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/logout"
-        android:id="@+id/logout_button"
-        />
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_gravity="center">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_map"
+            android:id="@+id/menu_map"
+            android:layout_marginBottom="@dimen/main_button_bottom_margin"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/logout"
+            android:id="@+id/logout_button"
+            android:layout_marginBottom="@dimen/main_button_bottom_margin"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+    </LinearLayout>
 </LinearLayout>
