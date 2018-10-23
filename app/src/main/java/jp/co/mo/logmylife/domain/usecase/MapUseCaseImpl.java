@@ -27,4 +27,12 @@ public class MapUseCaseImpl extends AbstractUseCase implements MapUseCase {
         mapRepository.saveInfoWindowData(context, placeData);
     }
 
+    @Override
+    public MapPlaceData getLastInsertedMapData() {
+        if(mapRepository == null) {
+            mapRepository = new MapRepository();
+        }
+        return mapRepository.getLastInsertedMapData();
+    }
+
 }

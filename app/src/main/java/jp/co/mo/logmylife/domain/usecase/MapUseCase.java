@@ -13,4 +13,6 @@ public interface MapUseCase {
 
     public void saveMapPlaceData(Context context, MapPlaceData placeData);
 
+    public MapPlaceData getLastInsertedMapData();
+
 }

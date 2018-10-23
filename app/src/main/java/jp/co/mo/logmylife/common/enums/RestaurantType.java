@@ -5,6 +5,7 @@ import android.text.TextUtils;
 public enum RestaurantType {
 
     NO_VALUE(-1, ""),
+    DEFAULT(0, "Please Choose Restaurant Type."),
     JAPANESE(1, "JAPANESE"),
     CHINESE(2, "CHINESE"),
     KOREAN(3, "KOREAN"),

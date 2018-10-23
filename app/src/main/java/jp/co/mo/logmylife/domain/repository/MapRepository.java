@@ -29,7 +29,8 @@ public class MapRepository {
         SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();
         Cursor cursor = db.query(
                 MapDataTableHelper.TABLE_NAME,
-        new String[]{MapDataTableHelper.COLUMN_NAME_USER_ID,
+        new String[]{MapDataTableHelper.COLUMN_NAME_ID,
+                MapDataTableHelper.COLUMN_NAME_USER_ID,
                 MapDataTableHelper.COLUMN_NAME_TITLE,
                 MapDataTableHelper.COLUMN_NAME_LAT,
                 MapDataTableHelper.COLUMN_NAME_LNG,
@@ -50,6 +51,7 @@ public class MapRepository {
 
         for(int i = 0; i < cursor.getCount(); i++) {
             MapPlaceData data = new MapPlaceData();
+            data.setId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_ID_NUM));
             data.setUserId(cursor.getString(MapDataTableHelper.COLUMN_NAME_USER_ID_NUM));
             data.setTitle(cursor.getString(MapDataTableHelper.COLUMN_NAME_TITLE_NUM));
             data.setLat(cursor.getDouble(MapDataTableHelper.COLUMN_NAME_LAT_NUM));
@@ -68,6 +70,11 @@ public class MapRepository {
         cursor.close();
 
         return list;
+    }
+
+    public MapPlaceData getLastInsertedMapData() {
+        SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();
+        return mapDataTableHelper.getLastInsertedRecord(db);
     }
 
     public void saveInfoWindowData(Context context, MapPlaceData placeData) {

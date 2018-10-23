@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,6 +27,7 @@ import butterknife.ButterKnife;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.enums.MapDataType;
 import jp.co.mo.logmylife.common.enums.RestaurantType;
+import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
@@ -77,16 +80,16 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
             title.setText(mMapPlaceData.getTitle());
             setDataType(type);
             if(mMapPlaceData.getTypeId() != null) {
-                type.setSelection(mMapPlaceData.getTypeId());
                 if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
                         || (mDataTypeSelected != null && mDataTypeSelected.id != null && MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id)))) {
                     typeDetailTitle.setVisibility(View.VISIBLE);
                     typeDetail.setVisibility(View.VISIBLE);
                 }
+                type.setSelection(mMapPlaceData.getTypeId());
             }
             setRestaurantType(typeDetail);
             if(mMapPlaceData.getTypeDetailId() != null) {
-                type.setSelection(mMapPlaceData.getTypeDetailId());
+                typeDetail.setSelection(mMapPlaceData.getTypeDetailId());
             }
             url.setText(mMapPlaceData.getUrl());
             details.setText(mMapPlaceData.getDetail());
@@ -121,6 +124,7 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
                 } else {
                     typeDetailTitle.setVisibility(View.GONE);
                     typeDetail.setVisibility(View.GONE);
+                    mRestaurantTypeSelected = null;
                 }
             }
 
@@ -193,7 +197,6 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
                 changeInfoUpdateStatus(true);
                 break;
             case R.id.update_place_info:
-                // TODO: update using api.
                 updateData();
                 changeInfoUpdateStatus(false);
                 break;
@@ -217,16 +220,30 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         mMapPlaceData.setTitle(title.getText().toString());
         mMapPlaceData.setLat(mMapPlaceData.getLat());
         mMapPlaceData.setLng(mMapPlaceData.getLng());
-        // TODO: 数字を選択式にする。
         mMapPlaceData.setTypeId((Integer)mDataTypeSelected.id);
-        mMapPlaceData.setTypeDetailId((Integer)mRestaurantTypeSelected.id);
+        if(mRestaurantTypeSelected != null && mRestaurantTypeSelected.id != null) {
+            mMapPlaceData.setTypeDetailId((Integer)mRestaurantTypeSelected.id);
+        }
         mMapPlaceData.setUrl(url.getText().toString());
         mMapPlaceData.setDetail(details.getText().toString());
         mMapPlaceData.setCreateDate(mMapPlaceData.getCreateDate());
-        mMapPlaceData.setUpdateDate(mMapPlaceData.getUpdateDate());
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
+            String date = sdf.format(new Date());
+            mMapPlaceData.setUpdateDate(date);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
 
         mMapUseCase.saveMapPlaceData(mContext, mMapPlaceData);
+        // if it's new record, getting record.
+        if(mMapPlaceData.getId() == null) {
+            mMapPlaceData = mMapUseCase.getLastInsertedMapData();
+        }
         // マーカーにセットし直す。
+        mMarker.setTitle(mMapPlaceData.getTitle());
         mMarker.setTag(mMapPlaceData);
     }
 

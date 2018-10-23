@@ -5,6 +5,7 @@ import android.text.TextUtils;
 public enum MapDataType {
 
     NO_VALUE(-1, ""),
+    DEFAULT(0, "Please Choose Place Type."),
     RESTAURANT(1, "Restaurant"),
     SUPERMARKET(2, "Super Market"),
     AMUSEMENT_PARK(3, "Amusement Park"),
