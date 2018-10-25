@@ -8,18 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
+import jp.co.mo.logmylife.domain.entity.map.MapPlacePicData;
 
 public class MapRepository {
 
     private MapDataTableHelper mapDataTableHelper = null;
+
+    public MapRepository() {
+    }
+
+    public MapRepository(Context context) {
+        mapDataTableHelper = new MapDataTableHelper(context);
+    }
 
     public List<MapPlaceData> getInfoWindowDatas(Context context) {
         if(mapDataTableHelper == null) {
             mapDataTableHelper = new MapDataTableHelper(context);
         }
         List<MapPlaceData> list = readMapData();
-
-        // TODO: picの情報も取り入れる事。
 
         return list;
     }
@@ -72,6 +78,53 @@ public class MapRepository {
         return list;
     }
 
+    public List<MapPlacePicData> getMapPlacePicDatas(Context context, Integer placeId) {
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
+        List<MapPlacePicData> list = readMapPlacePicDatas(placeId);
+
+        return list;
+    }
+
+    private List<MapPlacePicData> readMapPlacePicDatas(Integer placeId) {
+        List<MapPlacePicData> list = new ArrayList<>();
+        SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();
+        Cursor cursor = db.query(
+                MapDataTableHelper.PIC_TABLE_NAME,
+                new String[]{MapDataTableHelper.COLUMN_NAME_PIC_ID,
+                        MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID,
+                        MapDataTableHelper.COLUMN_NAME_PIC_TITLE,
+                        MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH,
+                        MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE,
+                        MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE},
+                MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID + "= ?",
+                new String[]{placeId.toString()},
+                null,
+                null,
+                null
+        );
+
+        cursor.moveToFirst();
+
+        for(int i = 0; i < cursor.getCount(); i++) {
+            MapPlacePicData data = new MapPlacePicData();
+            data.setId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_ID_NUM));
+            data.setMapPlaceId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID_NUM));
+            data.setTitle(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_TITLE_NUM));
+            data.setFilePath(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH_NUM));
+            data.setCreateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE_NUM));
+            data.setUpdateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE_NUM));
+            cursor.moveToNext();
+            list.add(data);
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+
     public MapPlaceData getLastInsertedMapData() {
         SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();
         return mapDataTableHelper.getLastInsertedRecord(db);
@@ -82,14 +135,17 @@ public class MapRepository {
             mapDataTableHelper = new MapDataTableHelper(context);
         }
 
-        saveMapData(placeData);
-        // TODO: picの情報もsaveする事。
-    }
-
-    private void saveMapData(MapPlaceData placeData) {
         SQLiteDatabase db = mapDataTableHelper.getWritableDatabase();
         mapDataTableHelper.saveData(db, null, placeData);
     }
 
+    public void savePicData(Context context, MapPlaceData placeData) {
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
+
+        SQLiteDatabase db = mapDataTableHelper.getWritableDatabase();
+        mapDataTableHelper.savePicData(db, null, placeData);
+    }
 
 }

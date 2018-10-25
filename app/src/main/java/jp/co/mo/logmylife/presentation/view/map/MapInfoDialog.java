@@ -3,6 +3,7 @@ package jp.co.mo.logmylife.presentation.view.map;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -38,9 +39,12 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
     private static final String TAG = MapInfoDialog.class.getSimpleName();
 
     private static final int PREV_BUTTON = 0;
-    private static final int NEXT_BUTTON = 1;
+    private static final int NEXT_BUTTON = PREV_BUTTON + 1;
+
+    public static final int ADD_IMAGE_BUTTON_RESULT = 0;
 
 
+    private Activity mActivity;
     private Context mContext;
     private MapPlaceData mMapPlaceData;
     private Marker mMarker;
@@ -61,11 +65,13 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
     @BindView(R.id.pictures) ViewPager picsViewPager;
     @BindView(R.id.prev_img) ImageView prevImg;
     @BindView(R.id.next_img) ImageView nextImg;
+    @BindView(R.id.add_image) Button addImage;
 
     private MapUseCaseImpl mMapUseCase = null;
 
     public MapInfoDialog(Activity activity, MapPlaceData mapPlaceData, Marker marker) {
         super(activity);
+        this.mActivity = activity;
         this.mContext = activity.getApplicationContext();
         this.mMapPlaceData = mapPlaceData;
         this.mMarker = marker;
@@ -84,12 +90,18 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
 
         if(mMapPlaceData != null) {
             title.setText(mMapPlaceData.getTitle());
-            PicturesPagerAdapter picsPagerAdapter = new PicturesPagerAdapter(mContext);
+            PicturesPagerAdapter picsPagerAdapter;
+            if(mMapPlaceData.getId() == null) {
+                picsPagerAdapter = new PicturesPagerAdapter(mContext);
+            } else {
+                picsPagerAdapter = new PicturesPagerAdapter(mContext, mMapPlaceData.getId());
+            }
             picsViewPager.setAdapter(picsPagerAdapter);
             prevImg.setClickable(true);
             prevImg.setOnClickListener(onClickListener(PREV_BUTTON));
             nextImg.setClickable(true);
             nextImg.setOnClickListener(onClickListener(NEXT_BUTTON));
+            addImage.setOnClickListener(this);
 
             setDataType(type);
             if(mMapPlaceData.getTypeId() != null) {
@@ -211,7 +223,7 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
                     if (picsViewPager.getCurrentItem() < picsViewPager.getAdapter().getCount() - 1) {
                         picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() + 1);
                     }
-                } else if(i == PREV_BUTTON){
+                } else if(i == PREV_BUTTON) {
                     //previous page
                     if (picsViewPager.getCurrentItem() > 0) {
                         picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() - 1);
@@ -230,6 +242,13 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
             case R.id.update_place_info:
                 updateData();
                 changeInfoUpdateStatus(false);
+                break;
+            case R.id.add_image:
+                // TODO: show photo garally
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra("hoge", "foo");
+                mActivity.startActivityForResult(intent, ADD_IMAGE_BUTTON_RESULT);
                 break;
             default:
                 break;
@@ -273,6 +292,7 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         if(mMapPlaceData.getId() == null) {
             mMapPlaceData = mMapUseCase.getLastInsertedMapData();
         }
+        mMapUseCase.saveMapPlaceData(mContext, mMapPlaceData);
         // マーカーにセットし直す。
         mMarker.setTitle(mMapPlaceData.getTitle());
         mMarker.setTag(mMapPlaceData);

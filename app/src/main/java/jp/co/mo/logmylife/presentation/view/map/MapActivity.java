@@ -2,7 +2,9 @@ package jp.co.mo.logmylife.presentation.view.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -12,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +38,9 @@ import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.CopyDialog;
 import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
+import jp.co.mo.logmylife.common.util.RealPathUtil;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
+import jp.co.mo.logmylife.domain.entity.map.MapPlacePicData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
 public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMarkerClickListener,
@@ -123,7 +129,8 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         Logger.debug(TAG, "onMarkerClick");
         MapPlaceData data = (MapPlaceData) marker.getTag();
         if(data != null) {
-            MapPlaceData placeData = new MapPlaceData();
+//            MapPlaceData placeData = new MapPlaceData();
+            placeData = new MapPlaceData();
             placeData.setId(data.getId());
             placeData.setUserId(data.getUserId());
             placeData.setTitle(data.getTitle());
@@ -213,6 +220,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     }
 
+    private MapPlaceData placeData;
     @Override
     public void onMapLongClick(LatLng latLng) {
         Logger.debug(TAG, "onMapLongClick");
@@ -221,7 +229,8 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         markerOptions.position(snowqualmie)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
-        MapPlaceData placeData = new MapPlaceData();
+//        MapPlaceData placeData = new MapPlaceData();
+        placeData = new MapPlaceData();
         placeData.setLat(latLng.latitude);
         placeData.setLng(latLng.longitude);
         try {
@@ -242,4 +251,48 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         MapInfoDialog dialog = new MapInfoDialog(this, placeData, m);
         dialog.show();
     }
+
+    @Override
+    public void onActivityResult (
+            int requestCode,
+            int resultCode,
+            Intent data) {
+        Logger.error(TAG, "onActivityResult!!");
+        String realPath = "";
+        if(data == null) {
+            Logger.error(TAG, "data is null");
+            return;
+        }
+
+        if(resultCode == Activity.RESULT_OK) {
+            Logger.error(TAG, "result ok");
+            realPath = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
+            if(!TextUtils.isEmpty(realPath)) {
+                MapPlacePicData picData = new MapPlacePicData();
+                picData.setFilePath(realPath);
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
+                    String date = sdf.format(new Date());
+                    picData.setCreateDate(date);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+                if(placeData.getPicList() == null || placeData.getPicList().isEmpty()) {
+                    List<MapPlacePicData> list = new ArrayList<>();
+                    list.add(picData);
+                    placeData.setPicList(list);
+                } else {
+                    placeData.getPicList().add(picData);
+                }
+            } else {
+
+            }
+            Logger.error(TAG, "realPath to img: " + realPath);
+        } else {
+            Logger.error(TAG, "result ng");
+        }
+    }
+
 }

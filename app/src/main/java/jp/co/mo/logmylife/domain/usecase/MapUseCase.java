@@ -11,7 +11,11 @@ public interface MapUseCase {
 
     public List<MapPlaceData> getMapPlaceDatas(Context context);
 
+    public List<MapPlacePicData> getMapPlacePicDatas(Context context, Integer placeId);
+
     public void saveMapPlaceData(Context context, MapPlaceData placeData);
+
+    public void saveMapPicData(Context context, MapPlaceData placeData);
 
     public MapPlaceData getLastInsertedMapData();
 

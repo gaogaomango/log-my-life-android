@@ -7,10 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
+import jp.co.mo.logmylife.domain.entity.map.MapPlacePicData;
 
 public class MapDataTableHelper extends AbstractDataTableHelper {
 
@@ -39,6 +42,21 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
     protected static final int COLUMN_NAME_CREATE_DATE_NUM = COLUMN_NAME_DETAIL_NUM + 1;
     protected static final int COLUMN_NAME_UPDATE_DATE_NUM = COLUMN_NAME_CREATE_DATE_NUM + 1;
 
+    protected static final String PIC_TABLE_NAME = "mapPicInfo";
+    protected static final String COLUMN_NAME_PIC_ID = "_id";
+    protected static final String COLUMN_NAME_PIC_MAP_PLACE_ID = "mapPlaceId";
+    protected static final String COLUMN_NAME_PIC_TITLE = "title";
+    protected static final String COLUMN_NAME_PIC_FILE_PATH = "filePath";
+    protected static final String COLUMN_NAME_PIC_CREATE_DATE = "createDate";
+    protected static final String COLUMN_NAME_PIC_UPDATE_DATE = "updateDate";
+
+    protected static final int COLUMN_NAME_PIC_ID_NUM = 0;
+    protected static final int COLUMN_NAME_PIC_MAP_PLACE_ID_NUM = COLUMN_NAME_PIC_ID_NUM + 1;
+    protected static final int COLUMN_NAME_PIC_TITLE_NUM = COLUMN_NAME_PIC_MAP_PLACE_ID_NUM + 1;
+    protected static final int COLUMN_NAME_PIC_FILE_PATH_NUM = COLUMN_NAME_PIC_TITLE_NUM + 1;
+    protected static final int COLUMN_NAME_PIC_CREATE_DATE_NUM = COLUMN_NAME_PIC_FILE_PATH_NUM + 1;
+    protected static final int COLUMN_NAME_PIC_UPDATE_DATE_NUM = COLUMN_NAME_PIC_CREATE_DATE_NUM + 1;
+
     // TODO: image fileは別から取得する。
 
     private static final String SQL_CREATE_ENTRIES =
@@ -57,6 +75,19 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+    private static final String SQL_CREATE_PIC_ENTRIES =
+            "CREATE TABLE  IF NOT EXISTS " + PIC_TABLE_NAME + " (" +
+                    COLUMN_NAME_PIC_ID + " INTEGER PRIMARY KEY," +
+                    COLUMN_NAME_PIC_MAP_PLACE_ID + " INTEGER NOT NULL," +
+                    COLUMN_NAME_PIC_TITLE + " TEXT," +
+                    COLUMN_NAME_PIC_FILE_PATH + " TEXT NOT NULL," +
+                    COLUMN_NAME_PIC_CREATE_DATE + " DATETIME default current_timestamp," +
+                    COLUMN_NAME_PIC_UPDATE_DATE + "  DATETIME default current_timestamp)";
+
+    private static final String SQL_DELETE_PIC_ENTRIES =
+            "DROP TABLE IF EXISTS " + PIC_TABLE_NAME;
+
 
     private static final String SQL_LAST_INSERTED_RECORD_ENTRIES =
             "SELECT " + COLUMN_NAME_ID + ", " +
@@ -79,16 +110,22 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(
-                SQL_CREATE_ENTRIES
-        );
+        String[] queries = { SQL_CREATE_ENTRIES, SQL_CREATE_PIC_ENTRIES };
+        for(String query : queries) {
+            db.execSQL(
+                    query
+            );
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(
-                SQL_DELETE_ENTRIES
-        );
+        String[] queries = { SQL_DELETE_ENTRIES, SQL_DELETE_PIC_ENTRIES };
+        for(String query : queries) {
+            db.execSQL(
+                    query
+            );
+        }
         onCreate(db);
     }
 
@@ -131,6 +168,29 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
         setDate(values, COLUMN_NAME_UPDATE_DATE, data.getUpdateDate());
 
         db.insert(TABLE_NAME, null, values);
+    }
+
+    public void savePicData(SQLiteDatabase db, String userId, MapPlaceData data) {
+        if(data.getPicList() == null || data.getPicList().isEmpty()) {
+            return;
+        }
+
+        if(data.getId() == null) {
+            return;
+        }
+
+        for(MapPlacePicData pic : data.getPicList()) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_NAME_PIC_MAP_PLACE_ID, data.getId());
+            if(!TextUtils.isEmpty(pic.getTitle())) {
+                values.put(COLUMN_NAME_PIC_TITLE, pic.getTitle());
+            }
+            values.put(COLUMN_NAME_PIC_FILE_PATH, pic.getFilePath());
+            setDate(values, COLUMN_NAME_CREATE_DATE, pic.getCreateDate());
+            setDate(values, COLUMN_NAME_UPDATE_DATE, pic.getUpdateDate());
+            db.insert(PIC_TABLE_NAME, null, values);
+        }
+
     }
 
     private void setDate(ContentValues values, String key, String dateText) {
