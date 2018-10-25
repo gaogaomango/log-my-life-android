@@ -1,5 +1,8 @@
 package jp.co.mo.logmylife.domain.entity.map;
 
+import com.google.android.gms.maps.model.Marker;
+
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.Getter;
@@ -7,7 +10,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class MapPlaceData {
+public class MapPlaceData implements Serializable {
 
     private Integer id;
     private String userId;
@@ -21,5 +24,7 @@ public class MapPlaceData {
     private String detail;
     private String createDate;
     private String updateDate;
+
+    private Marker marker;
 
 }

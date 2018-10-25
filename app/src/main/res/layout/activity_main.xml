@@ -23,10 +23,10 @@
         android:layout_gravity="center">
 
         <Button
+            android:id="@+id/menu_map"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/menu_map"
-            android:id="@+id/menu_map"
             android:layout_marginBottom="@dimen/main_button_bottom_margin"
             />
 

@@ -82,48 +82,11 @@ public class MapRepository {
         if(mapDataTableHelper == null) {
             mapDataTableHelper = new MapDataTableHelper(context);
         }
-        List<MapPlacePicData> list = readMapPlacePicDatas(placeId);
-
-        return list;
-    }
-
-    private List<MapPlacePicData> readMapPlacePicDatas(Integer placeId) {
-        List<MapPlacePicData> list = new ArrayList<>();
         SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();
-        Cursor cursor = db.query(
-                MapDataTableHelper.PIC_TABLE_NAME,
-                new String[]{MapDataTableHelper.COLUMN_NAME_PIC_ID,
-                        MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID,
-                        MapDataTableHelper.COLUMN_NAME_PIC_TITLE,
-                        MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH,
-                        MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE,
-                        MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE},
-                MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID + "= ?",
-                new String[]{placeId.toString()},
-                null,
-                null,
-                null
-        );
-
-        cursor.moveToFirst();
-
-        for(int i = 0; i < cursor.getCount(); i++) {
-            MapPlacePicData data = new MapPlacePicData();
-            data.setId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_ID_NUM));
-            data.setMapPlaceId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID_NUM));
-            data.setTitle(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_TITLE_NUM));
-            data.setFilePath(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH_NUM));
-            data.setCreateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE_NUM));
-            data.setUpdateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE_NUM));
-            cursor.moveToNext();
-            list.add(data);
-        }
-
-        cursor.close();
+        List<MapPlacePicData> list = mapDataTableHelper.readMapPlacePicDatas(db, placeId);
 
         return list;
     }
-
 
     public MapPlaceData getLastInsertedMapData() {
         SQLiteDatabase db = mapDataTableHelper.getReadableDatabase();

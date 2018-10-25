@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AbstractDataTableHelper extends SQLiteOpenHelper {
 
-    protected static final int DATABASE_VERSION = 2;
+    protected static final int DATABASE_VERSION = 1;
 
     protected static final String DATABASE_NAME = "LogMyLife.db";
 

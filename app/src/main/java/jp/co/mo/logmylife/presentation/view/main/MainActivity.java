@@ -1,43 +1,50 @@
 package jp.co.mo.logmylife.presentation.view.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
-import jp.co.mo.logmylife.presentation.view.login.LoginActivity;
+import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.presentation.view.map.MapActivity;
+import jp.co.mo.logmylife.presentation.view.map.MapInfoDialog;
 
 public class MainActivity extends AbstractBaseActivity {
 
-    private FirebaseAuth mAuth;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
-    private Button logoutButton;
+//    private FirebaseAuth mAuth;
 
-    private Button menuMap;
+    private Context mContext;
+    @BindView(R.id.logout_button) Button logoutButton;
+    @BindView(R.id.menu_map) Button menuMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        mContext = this;
 
-        mAuth = FirebaseAuth.getInstance();
+//        mAuth = FirebaseAuth.getInstance();
 
-        logoutButton = findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuth.signOut();
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+//                mAuth.signOut();
+//                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//                startActivity(intent);
+//                finish();
+                Logger.error(TAG, "It's logout menu!");
+                Toast.makeText(mContext, "It's stopped for now", Toast.LENGTH_LONG).show();
             }
         });
-        menuMap = findViewById(R.id.menu_map);
         menuMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,11 +54,17 @@ public class MainActivity extends AbstractBaseActivity {
         });
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        if(mAuth == null) {
-            mAuth = FirebaseAuth.getInstance();
-        }
+//        if(mAuth == null) {
+//            mAuth = FirebaseAuth.getInstance();
+//        }
     }
 }

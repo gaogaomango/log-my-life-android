@@ -57,8 +57,6 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
     protected static final int COLUMN_NAME_PIC_CREATE_DATE_NUM = COLUMN_NAME_PIC_FILE_PATH_NUM + 1;
     protected static final int COLUMN_NAME_PIC_UPDATE_DATE_NUM = COLUMN_NAME_PIC_CREATE_DATE_NUM + 1;
 
-    // TODO: image fileは別から取得する。
-
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE  IF NOT EXISTS " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + " INTEGER PRIMARY KEY," +
@@ -140,7 +138,7 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
             data.setLng(c.getDouble(MapDataTableHelper.COLUMN_NAME_LNG_NUM));
             data.setTypeId(c.getInt(MapDataTableHelper.COLUMN_NAME_TYPE_ID_NUM));
             data.setTypeDetailId(c.getInt(MapDataTableHelper.COLUMN_NAME_TYPE_DETAIL_ID_NUM));
-            // TODO: get pic info
+            data.setPicList(readMapPlacePicDatas(db, c.getInt(MapDataTableHelper.COLUMN_NAME_ID_NUM)));
             data.setUrl(c.getString(MapDataTableHelper.COLUMN_NAME_URL_NUM));
             data.setDetail(c.getString(MapDataTableHelper.COLUMN_NAME_DETAIL_NUM));
             data.setCreateDate(c.getString(MapDataTableHelper.COLUMN_NAME_CREATE_DATE_NUM));
@@ -149,6 +147,42 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
             return data;
         }
         return null;
+    }
+
+    public List<MapPlacePicData> readMapPlacePicDatas(SQLiteDatabase db, Integer placeId) {
+        List<MapPlacePicData> list = new ArrayList<>();
+        Cursor cursor = db.query(
+                MapDataTableHelper.PIC_TABLE_NAME,
+                new String[]{MapDataTableHelper.COLUMN_NAME_PIC_ID,
+                        MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID,
+                        MapDataTableHelper.COLUMN_NAME_PIC_TITLE,
+                        MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH,
+                        MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE,
+                        MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE},
+                MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID + "= ?",
+                new String[]{placeId.toString()},
+                null,
+                null,
+                null
+        );
+
+        cursor.moveToFirst();
+
+        for(int i = 0; i < cursor.getCount(); i++) {
+            MapPlacePicData data = new MapPlacePicData();
+            data.setId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_ID_NUM));
+            data.setMapPlaceId(cursor.getInt(MapDataTableHelper.COLUMN_NAME_PIC_MAP_PLACE_ID_NUM));
+            data.setTitle(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_TITLE_NUM));
+            data.setFilePath(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_FILE_PATH_NUM));
+            data.setCreateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_CREATE_DATE_NUM));
+            data.setUpdateDate(cursor.getString(MapDataTableHelper.COLUMN_NAME_PIC_UPDATE_DATE_NUM));
+            cursor.moveToNext();
+            list.add(data);
+        }
+
+        cursor.close();
+
+        return list;
     }
 
     public void saveData(SQLiteDatabase db, String userId, MapPlaceData data) {

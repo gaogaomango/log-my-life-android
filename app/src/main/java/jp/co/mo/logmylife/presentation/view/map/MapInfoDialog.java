@@ -288,14 +288,16 @@ public class MapInfoDialog extends Dialog implements View.OnClickListener {
         }
 
         mMapUseCase.saveMapPlaceData(mContext, mMapPlaceData);
+        mMapUseCase.saveMapPicData(mContext, mMapPlaceData);
         // if it's new record, getting record.
         if(mMapPlaceData.getId() == null) {
             mMapPlaceData = mMapUseCase.getLastInsertedMapData();
         }
-        mMapUseCase.saveMapPlaceData(mContext, mMapPlaceData);
         // マーカーにセットし直す。
         mMarker.setTitle(mMapPlaceData.getTitle());
         mMarker.setTag(mMapPlaceData);
+
+        // TODO: refresh
     }
 
     private void changeInfoUpdateStatus(boolean canEdit) {

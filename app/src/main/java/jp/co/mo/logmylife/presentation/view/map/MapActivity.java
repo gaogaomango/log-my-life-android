@@ -3,6 +3,8 @@ package jp.co.mo.logmylife.presentation.view.map;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -246,10 +248,15 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
         Marker m = mMap.addMarker(markerOptions);
         m.setTag(placeData);
+        placeData.setMarker(m);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
 
-        MapInfoDialog dialog = new MapInfoDialog(this, placeData, m);
-        dialog.show();
+        MapDetailDialogFragment fragment = MapDetailDialogFragment.newInstance(placeData);
+        android.support.v4.app.FragmentManager fm = this.getSupportFragmentManager();
+        fragment.show(fm, "dialog");
+
+//        MapInfoDialog dialog = new MapInfoDialog(this, placeData, m);
+//        dialog.show();
     }
 
     @Override
