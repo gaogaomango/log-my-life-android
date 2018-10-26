@@ -366,9 +366,7 @@ public class MapDetailDialogFragment extends DialogFragment {
                         mMapPlaceData.getPicList().add(picData);
                     }
                 }
-                Logger.debug(TAG, "realPath to img: " + realPath);
-
-                // TODO: 画像をアップデートする。
+                // TODO: 画像を一時表示
             }
         }
     }
@@ -378,6 +376,7 @@ public class MapDetailDialogFragment extends DialogFragment {
         title.setEnabled(canEdit);
         type.setEnabled(canEdit);
         typeDetail.setEnabled(canEdit);
+        addImage.setEnabled(canEdit);
         url.setEnabled(canEdit);
         details.setEnabled(canEdit);
 
