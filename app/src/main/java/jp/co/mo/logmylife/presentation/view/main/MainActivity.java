@@ -13,7 +13,6 @@ import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.presentation.view.map.MapActivity;
-import jp.co.mo.logmylife.presentation.view.map.MapInfoDialog;
 
 public class MainActivity extends AbstractBaseActivity {
 

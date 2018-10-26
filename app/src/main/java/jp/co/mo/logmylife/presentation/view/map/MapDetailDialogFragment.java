@@ -1,8 +1,12 @@
 package jp.co.mo.logmylife.presentation.view.map;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,36 +21,44 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Marker;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.enums.MapDataType;
 import jp.co.mo.logmylife.common.enums.RestaurantType;
+import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
+import jp.co.mo.logmylife.common.util.RealPathUtil;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
+import jp.co.mo.logmylife.domain.entity.map.MapPlacePicData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
+
+import static android.app.Activity.RESULT_OK;
 
 public class MapDetailDialogFragment extends DialogFragment {
 
-    private static final String TAG = MapInfoDialog.class.getSimpleName();
+    private static final String TAG = MapDetailDialogFragment.class.getSimpleName();
 
     private static final String MAP_PLACE_DATA_KEY = "mapPlaceDataKey";
 
+    private static final int ADD_IMAGE_BUTTON_RESULT = 0;
+
     private static final int PREV_BUTTON = 0;
     private static final int NEXT_BUTTON = PREV_BUTTON + 1;
+    private static final int ADD_IMAGE_BUTTON = NEXT_BUTTON + 1;
+    private static final int EDIT_BUTTON = ADD_IMAGE_BUTTON + 1;
+    private static final int UPDATE_BUTTON = EDIT_BUTTON + 1;
 
-    public static final int ADD_IMAGE_BUTTON = NEXT_BUTTON + 1;
-
-
-//    private Activity mActivity;
-//    private Context mContext;
     private MapPlaceData mMapPlaceData;
     private Marker mMarker;
 
-//    private MapInfoDialog.MapDataTypeItem mDataTypeSelected;
-//    private MapInfoDialog.MapRestaurantTypeItem mRestaurantTypeSelected;
+    private MapDetailDialogFragment.MapDataTypeItem mDataTypeSelected;
+    private MapDetailDialogFragment.MapRestaurantTypeItem mRestaurantTypeSelected;
 
     @BindView(R.id.title) EditText title;
     @BindView(R.id.type) Spinner type;
@@ -65,13 +77,28 @@ public class MapDetailDialogFragment extends DialogFragment {
 
     private MapUseCaseImpl mMapUseCase = null;
 
-    // MapPlaceDataの中のMarkerを代入しておくこと。
+    private UpdateMarker mUpdateMarker;
+
     public static MapDetailDialogFragment newInstance(MapPlaceData mapPlaceData) {
+        if(mapPlaceData == null) {
+            return null;
+        }
         MapDetailDialogFragment fragment = new MapDetailDialogFragment();
         Bundle b = new Bundle();
         b.putSerializable(MAP_PLACE_DATA_KEY, mapPlaceData);
         fragment.setArguments(b);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity;
+
+        if (context instanceof Activity){
+            activity = (Activity) context;
+            mUpdateMarker = (UpdateMarker) activity;
+        }
     }
 
     @Override
@@ -82,9 +109,10 @@ public class MapDetailDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.map_custom_infowindow, null);
+        ButterKnife.bind(this, view);
         Bundle b = getArguments();
         mMapPlaceData = (MapPlaceData) b.getSerializable(MAP_PLACE_DATA_KEY);
-
+        setParams();
         return view;
     }
 
@@ -107,22 +135,19 @@ public class MapDetailDialogFragment extends DialogFragment {
                 picsPagerAdapter = new PicturesPagerAdapter(getActivity().getApplicationContext(), mMapPlaceData.getId());
             }
             picsViewPager.setAdapter(picsPagerAdapter);
-            prevImg.setClickable(true);
             prevImg.setOnClickListener(onClickListener(PREV_BUTTON));
-            nextImg.setClickable(true);
             nextImg.setOnClickListener(onClickListener(NEXT_BUTTON));
             addImage.setOnClickListener(onClickListener(ADD_IMAGE_BUTTON));
 
             setDataType(type);
-            // TODO: やり直し。
-//            if(mMapPlaceData.getTypeId() != null) {
-//                if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
-//                        || (mDataTypeSelected != null && mDataTypeSelected.id != null && MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id)))) {
-//                    typeDetailTitle.setVisibility(View.VISIBLE);
-//                    typeDetail.setVisibility(View.VISIBLE);
-//                }
-//                type.setSelection(mMapPlaceData.getTypeId());
-//            }
+            if(mMapPlaceData.getTypeId() != null) {
+                if(MapDataType.RESTAURANT.equals(MapDataType.getById(mMapPlaceData.getTypeId()))
+                        || (mDataTypeSelected != null && mDataTypeSelected.id != null && MapDataType.RESTAURANT.equals(MapDataType.getById((Integer)mDataTypeSelected.id)))) {
+                    typeDetailTitle.setVisibility(View.VISIBLE);
+                    typeDetail.setVisibility(View.VISIBLE);
+                }
+                type.setSelection(mMapPlaceData.getTypeId());
+            }
             setRestaurantType(typeDetail);
             if(mMapPlaceData.getTypeDetailId() != null) {
                 typeDetail.setSelection(mMapPlaceData.getTypeDetailId());
@@ -131,9 +156,8 @@ public class MapDetailDialogFragment extends DialogFragment {
             details.setText(mMapPlaceData.getDetail());
             createDate.setText(mMapPlaceData.getCreateDate());
             updateDate.setText(mMapPlaceData.getUpdateDate());
-            // TODO: やり直し
-//            editBtn.setOnClickListener(this);
-//            updatePlaceInfo.setOnClickListener(this);
+            editBtn.setOnClickListener(onClickListener(EDIT_BUTTON));
+            updatePlaceInfo.setOnClickListener(onClickListener(UPDATE_BUTTON));
             changeInfoUpdateStatus(false);
         }
 
@@ -143,18 +167,35 @@ public class MapDetailDialogFragment extends DialogFragment {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (i == NEXT_BUTTON) {
-                    //next page
-                    if (picsViewPager.getCurrentItem() < picsViewPager.getAdapter().getCount() - 1) {
-                        picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() + 1);
-                    }
-                } else if(i == PREV_BUTTON) {
-                    //previous page
-                    if (picsViewPager.getCurrentItem() > 0) {
-                        picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() - 1);
-                    }
-                } else if(i == ADD_IMAGE_BUTTON) {
+                switch (i) {
+                    case NEXT_BUTTON:
+                        if (picsViewPager.getCurrentItem() < picsViewPager.getAdapter().getCount() - 1) {
+                            picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() + 1);
+                        }
+                        break;
+                    case PREV_BUTTON:
+                        if (picsViewPager.getCurrentItem() > 0) {
+                            picsViewPager.setCurrentItem(picsViewPager.getCurrentItem() - 1);
+                        }
+                        break;
+                    case ADD_IMAGE_BUTTON:
+                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                        intent.setType("image/*");
+                        intent.putExtra("hoge", "foo");
+                        startActivityForResult(intent, ADD_IMAGE_BUTTON_RESULT);
 
+                        // TODO:
+                        break;
+                    case EDIT_BUTTON:
+                        changeInfoUpdateStatus(true);
+                        break;
+
+                    case UPDATE_BUTTON:
+                        updateData();
+                        changeInfoUpdateStatus(false);
+                        break;
+                    default:
+                        break;
                 }
             }
         };
@@ -176,16 +217,14 @@ public class MapDetailDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent,
                                        View view, int position, long id) {
                 MapDetailDialogFragment.MapDataTypeItem item = (MapDetailDialogFragment.MapDataTypeItem) parent.getItemAtPosition(position);
-                // TODO: やり直し
-//                mDataTypeSelected = item;
+                mDataTypeSelected = item;
                 if(MapDataType.RESTAURANT.equals(MapDataType.getById(((Integer)item.id).intValue()))) {
                     typeDetailTitle.setVisibility(View.VISIBLE);
                     typeDetail.setVisibility(View.VISIBLE);
                 } else {
                     typeDetailTitle.setVisibility(View.GONE);
                     typeDetail.setVisibility(View.GONE);
-                    // TODO: やり直し
-//                    mRestaurantTypeSelected = null;
+                    mRestaurantTypeSelected = null;
                 }
             }
 
@@ -226,8 +265,7 @@ public class MapDetailDialogFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> parent,
                                        View view, int position, long id) {
                 MapDetailDialogFragment.MapRestaurantTypeItem item = (MapDetailDialogFragment.MapRestaurantTypeItem) parent.getItemAtPosition(position);
-                // TODO: やり直し
-//                mRestaurantTypeSelected = item;
+                mRestaurantTypeSelected = item;
             }
 
             public void onNothingSelected(AdapterView<?> parent) {
@@ -251,6 +289,93 @@ public class MapDetailDialogFragment extends DialogFragment {
         }
     }
 
+    private void updateData() {
+        if(mMapUseCase == null) {
+            mMapUseCase = new MapUseCaseImpl();
+        }
+
+        if(mMapPlaceData.getId() != null) {
+            mMapPlaceData.setId(mMapPlaceData.getId());
+        }
+        if(mMapPlaceData.getUserId() != null) {
+            mMapPlaceData.setUserId(mMapPlaceData.getUserId());
+
+        }
+        mMapPlaceData.setTitle(title.getText().toString());
+        mMapPlaceData.setLat(mMapPlaceData.getLat());
+        mMapPlaceData.setLng(mMapPlaceData.getLng());
+        mMapPlaceData.setTypeId((Integer)mDataTypeSelected.id);
+        if(mRestaurantTypeSelected != null && mRestaurantTypeSelected.id != null) {
+            mMapPlaceData.setTypeDetailId((Integer)mRestaurantTypeSelected.id);
+        }
+        mMapPlaceData.setUrl(url.getText().toString());
+        mMapPlaceData.setDetail(details.getText().toString());
+        mMapPlaceData.setCreateDate(mMapPlaceData.getCreateDate());
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
+            String date = sdf.format(new Date());
+            mMapPlaceData.setUpdateDate(date);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+
+        mMapUseCase.saveMapPlaceData(this.getActivity().getApplicationContext(), mMapPlaceData);
+        mMapUseCase.saveMapPicData(this.getActivity().getApplicationContext(), mMapPlaceData);
+        // if it's new record, getting record.
+        if(mMapPlaceData.getId() == null) {
+            mMapPlaceData = mMapUseCase.getLastInsertedMapData();
+        }
+        if(mUpdateMarker != null) {
+            mUpdateMarker.updateMarker(mMapPlaceData);
+        }
+
+        // TODO: refresh
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Logger.debug(TAG, "onActivityResult!!");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_IMAGE_BUTTON_RESULT) {
+            if (resultCode == RESULT_OK) {
+
+                String realPath = "";
+                if(data == null) {
+                    Logger.error(TAG, "data is null");
+                    return;
+                }
+
+                realPath = RealPathUtil.getRealPathFromURI_API19(this.getActivity().getApplicationContext(), data.getData());
+                if(!TextUtils.isEmpty(realPath)) {
+                    MapPlacePicData picData = new MapPlacePicData();
+                    picData.setFilePath(realPath);
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
+                        String date = sdf.format(new Date());
+                        picData.setCreateDate(date);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                    }
+                    if(mMapPlaceData.getPicList() == null || mMapPlaceData.getPicList().isEmpty()) {
+                        List<MapPlacePicData> list = new ArrayList<>();
+                        list.add(picData);
+                        mMapPlaceData.setPicList(list);
+                    } else {
+                        mMapPlaceData.getPicList().add(picData);
+                    }
+                }
+                Logger.debug(TAG, "realPath to img: " + realPath);
+
+                // TODO: 画像をアップデートする。
+            }
+        }
+    }
+
+
     private void changeInfoUpdateStatus(boolean canEdit) {
         title.setEnabled(canEdit);
         type.setEnabled(canEdit);
@@ -265,6 +390,10 @@ public class MapDetailDialogFragment extends DialogFragment {
             editBtn.setVisibility(View.VISIBLE);
             updatePlaceInfo.setVisibility(View.GONE);
         }
+    }
+
+    interface UpdateMarker {
+        public void updateMarker(MapPlaceData mapPlaceData);
     }
 
 }

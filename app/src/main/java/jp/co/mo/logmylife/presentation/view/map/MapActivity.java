@@ -50,7 +50,8 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         GoogleMap.OnMyLocationClickListener,
         GoogleMap.OnMapLongClickListener,
         OnMapReadyCallback,
-        LocationListener{
+        LocationListener,
+        MapDetailDialogFragment.UpdateMarker{
 
     private static final String TAG = MapActivity.class.getSimpleName();
 
@@ -58,6 +59,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     private static final float MIN_DISTANCE = 1000;
 
     private GoogleMap mMap;
+    private Marker mMarker;
     private LocationManager mLocationManager;
     private MapUseCaseImpl mapUseCase;
 
@@ -121,6 +123,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
                 Marker m = mMap.addMarker(markerOptions);
                 m.setTag(data);
+                mMarker = m;
 
             }
         }
@@ -129,10 +132,10 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
     @Override
     public boolean onMarkerClick(Marker marker) {
         Logger.debug(TAG, "onMarkerClick");
+        mMarker = marker;
         MapPlaceData data = (MapPlaceData) marker.getTag();
         if(data != null) {
-//            MapPlaceData placeData = new MapPlaceData();
-            placeData = new MapPlaceData();
+            MapPlaceData placeData = new MapPlaceData();
             placeData.setId(data.getId());
             placeData.setUserId(data.getUserId());
             placeData.setTitle(data.getTitle());
@@ -145,8 +148,10 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             placeData.setCreateDate(data.getCreateDate());
             placeData.setUpdateDate(data.getUpdateDate());
 
-            MapInfoDialog dialog = new MapInfoDialog(this, placeData, marker);
-            dialog.show();
+            MapDetailDialogFragment fragment = MapDetailDialogFragment.newInstance(placeData);
+            android.support.v4.app.FragmentManager fm = this.getSupportFragmentManager();
+            fragment.show(fm, "mapDialog");
+
         }
 
         return false;
@@ -222,7 +227,6 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
 
     }
 
-    private MapPlaceData placeData;
     @Override
     public void onMapLongClick(LatLng latLng) {
         Logger.debug(TAG, "onMapLongClick");
@@ -231,8 +235,7 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         markerOptions.position(snowqualmie)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
-//        MapPlaceData placeData = new MapPlaceData();
-        placeData = new MapPlaceData();
+        MapPlaceData placeData = new MapPlaceData();
         placeData.setLat(latLng.latitude);
         placeData.setLng(latLng.longitude);
         try {
@@ -247,16 +250,14 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
         }
 
         Marker m = mMap.addMarker(markerOptions);
+        mMarker = m;
         m.setTag(placeData);
-        placeData.setMarker(m);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(snowqualmie));
 
         MapDetailDialogFragment fragment = MapDetailDialogFragment.newInstance(placeData);
         android.support.v4.app.FragmentManager fm = this.getSupportFragmentManager();
-        fragment.show(fm, "dialog");
+        fragment.show(fm, "mapDialog");
 
-//        MapInfoDialog dialog = new MapInfoDialog(this, placeData, m);
-//        dialog.show();
     }
 
     @Override
@@ -264,42 +265,15 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             int requestCode,
             int resultCode,
             Intent data) {
-        Logger.error(TAG, "onActivityResult!!");
-        String realPath = "";
-        if(data == null) {
-            Logger.error(TAG, "data is null");
-            return;
-        }
-
-        if(resultCode == Activity.RESULT_OK) {
-            Logger.error(TAG, "result ok");
-            realPath = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
-            if(!TextUtils.isEmpty(realPath)) {
-                MapPlacePicData picData = new MapPlacePicData();
-                picData.setFilePath(realPath);
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat(DateUtil.FORMAT_YYYYMMDDHHMMSS);
-                    String date = sdf.format(new Date());
-                    picData.setCreateDate(date);
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
-                if(placeData.getPicList() == null || placeData.getPicList().isEmpty()) {
-                    List<MapPlacePicData> list = new ArrayList<>();
-                    list.add(picData);
-                    placeData.setPicList(list);
-                } else {
-                    placeData.getPicList().add(picData);
-                }
-            } else {
-
-            }
-            Logger.error(TAG, "realPath to img: " + realPath);
-        } else {
-            Logger.error(TAG, "result ng");
-        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void updateMarker(MapPlaceData mapPlaceData) {
+        // マーカーにセットし直す。
+        if(mapPlaceData != null) {
+            mMarker.setTitle(mapPlaceData.getTitle());
+            mMarker.setTag(mapPlaceData);
+        }
+    }
 }

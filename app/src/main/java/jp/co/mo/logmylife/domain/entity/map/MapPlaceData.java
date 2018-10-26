@@ -1,7 +1,5 @@
 package jp.co.mo.logmylife.domain.entity.map;
 
-import com.google.android.gms.maps.model.Marker;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -24,7 +22,5 @@ public class MapPlaceData implements Serializable {
     private String detail;
     private String createDate;
     private String updateDate;
-
-    private Marker marker;
 
 }
