@@ -19,8 +19,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.Marker;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,7 +53,6 @@ public class MapDetailDialogFragment extends DialogFragment {
     private static final int UPDATE_BUTTON = EDIT_BUTTON + 1;
 
     private MapPlaceData mMapPlaceData;
-    private Marker mMarker;
 
     private MapDetailDialogFragment.MapDataTypeItem mDataTypeSelected;
     private MapDetailDialogFragment.MapRestaurantTypeItem mRestaurantTypeSelected;
@@ -135,6 +132,7 @@ public class MapDetailDialogFragment extends DialogFragment {
                 picsPagerAdapter = new PicturesPagerAdapter(getActivity().getApplicationContext(), mMapPlaceData.getId());
             }
             picsViewPager.setAdapter(picsPagerAdapter);
+            picsPagerAdapter.notifyDataSetChanged();
             prevImg.setOnClickListener(onClickListener(PREV_BUTTON));
             nextImg.setOnClickListener(onClickListener(NEXT_BUTTON));
             addImage.setOnClickListener(onClickListener(ADD_IMAGE_BUTTON));
@@ -322,16 +320,16 @@ public class MapDetailDialogFragment extends DialogFragment {
         }
 
         mMapUseCase.saveMapPlaceData(this.getActivity().getApplicationContext(), mMapPlaceData);
-        mMapUseCase.saveMapPicData(this.getActivity().getApplicationContext(), mMapPlaceData);
         // if it's new record, getting record.
         if(mMapPlaceData.getId() == null) {
-            mMapPlaceData = mMapUseCase.getLastInsertedMapData();
+            mMapPlaceData.setId(mMapUseCase.getLastInsertedMapData().getId());
         }
+        mMapUseCase.saveMapPicData(this.getActivity().getApplicationContext(), mMapPlaceData);
         if(mUpdateMarker != null) {
             mUpdateMarker.updateMarker(mMapPlaceData);
         }
 
-        // TODO: refresh
+        setParams();
     }
 
     @Override
