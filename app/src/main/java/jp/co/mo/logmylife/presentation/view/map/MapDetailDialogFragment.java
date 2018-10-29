@@ -58,11 +58,14 @@ public class MapDetailDialogFragment extends DialogFragment {
     private MapDetailDialogFragment.MapRestaurantTypeItem mRestaurantTypeSelected;
 
     @BindView(R.id.title) EditText title;
+    @BindView(R.id.title_txt) TextView titleTxt;
     @BindView(R.id.type) Spinner type;
     @BindView(R.id.type_details_title) TextView typeDetailTitle;
     @BindView(R.id.type_details) Spinner typeDetail;
     @BindView(R.id.url) EditText url;
+    @BindView(R.id.url_txt) TextView urlTxt;
     @BindView(R.id.details) EditText details;
+    @BindView(R.id.details_txt) TextView detailsTxt;
     @BindView(R.id.create_date) TextView createDate;
     @BindView(R.id.update_date) TextView updateDate;
     @BindView(R.id.edit_place_info) Button editBtn;
@@ -125,6 +128,7 @@ public class MapDetailDialogFragment extends DialogFragment {
     private void setParams() {
         if(mMapPlaceData != null) {
             title.setText(mMapPlaceData.getTitle());
+            titleTxt.setText(mMapPlaceData.getTitle());
             PicturesPagerAdapter picsPagerAdapter;
             if(mMapPlaceData.getId() == null) {
                 picsPagerAdapter = new PicturesPagerAdapter(getActivity().getApplicationContext());
@@ -151,7 +155,9 @@ public class MapDetailDialogFragment extends DialogFragment {
                 typeDetail.setSelection(mMapPlaceData.getTypeDetailId());
             }
             url.setText(mMapPlaceData.getUrl());
+            urlTxt.setText(mMapPlaceData.getUrl());
             details.setText(mMapPlaceData.getDetail());
+            detailsTxt.setText(mMapPlaceData.getDetail());
             createDate.setText(mMapPlaceData.getCreateDate());
             updateDate.setText(mMapPlaceData.getUpdateDate());
             editBtn.setOnClickListener(onClickListener(EDIT_BUTTON));
@@ -373,17 +379,26 @@ public class MapDetailDialogFragment extends DialogFragment {
 
 
     private void changeInfoUpdateStatus(boolean canEdit) {
-        title.setEnabled(canEdit);
         type.setEnabled(canEdit);
         typeDetail.setEnabled(canEdit);
         addImage.setEnabled(canEdit);
-        url.setEnabled(canEdit);
-        details.setEnabled(canEdit);
 
         if(canEdit) {
+            title.setVisibility(View.VISIBLE);
+            titleTxt.setVisibility(View.GONE);
+            url.setVisibility(View.VISIBLE);
+            urlTxt.setVisibility(View.GONE);
+            details.setVisibility(View.VISIBLE);
+            detailsTxt.setVisibility(View.GONE);
             editBtn.setVisibility(View.GONE);
             updatePlaceInfo.setVisibility(View.VISIBLE);
         } else {
+            title.setVisibility(View.GONE);
+            titleTxt.setVisibility(View.VISIBLE);
+            url.setVisibility(View.GONE);
+            urlTxt.setVisibility(View.VISIBLE);
+            details.setVisibility(View.GONE);
+            detailsTxt.setVisibility(View.VISIBLE);
             editBtn.setVisibility(View.VISIBLE);
             updatePlaceInfo.setVisibility(View.GONE);
         }
