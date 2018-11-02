@@ -30,6 +30,8 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
     protected static final String COLUMN_NAME_CREATE_DATE = "createDate";
     protected static final String COLUMN_NAME_UPDATE_DATE = "updateDate";
 
+    private static final String SQL_SANITIZE_LETTER = " = ?";
+
     protected static final int COLUMN_NAME_ID_NUM = 0;
     protected static final int COLUMN_NAME_USER_ID_NUM = COLUMN_NAME_ID_NUM + 1;
     protected static final int COLUMN_NAME_TITLE_NUM = COLUMN_NAME_USER_ID_NUM + 1;
@@ -204,6 +206,14 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
         db.insert(TABLE_NAME, null, values);
     }
 
+    public void removeData(SQLiteDatabase db, String userId, Integer placeId) {
+        if(placeId == null) {
+            return;
+        }
+        db.delete(TABLE_NAME, COLUMN_NAME_ID + SQL_SANITIZE_LETTER, new String[]{placeId.toString()});
+    }
+
+
     public void savePicData(SQLiteDatabase db, String userId, MapPlaceData data) {
         if(data.getPicList() == null || data.getPicList().isEmpty()) {
             return;
@@ -226,6 +236,14 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
         }
 
     }
+
+    public void removePicData(SQLiteDatabase db, String userId, Integer placeId) {
+        if(placeId == null) {
+            return;
+        }
+        db.delete(PIC_TABLE_NAME, COLUMN_NAME_PIC_MAP_PLACE_ID + SQL_SANITIZE_LETTER, new String[]{placeId.toString()});
+    }
+
 
     private void setDate(ContentValues values, String key, String dateText) {
         if(TextUtils.isEmpty(dateText)) {

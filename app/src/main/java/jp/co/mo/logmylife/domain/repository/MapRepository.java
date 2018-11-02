@@ -112,11 +112,21 @@ public class MapRepository {
     }
 
     public void deleteMapPlaceData(Context context, Integer placeId) {
-        // TODO: delete
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
+
+        SQLiteDatabase db = mapDataTableHelper.getWritableDatabase();
+        mapDataTableHelper.removeData(db, null, placeId);
     }
 
     public void deleteMapPicData(Context context, Integer placeId) {
-        // TODO: delete
+        if(mapDataTableHelper == null) {
+            mapDataTableHelper = new MapDataTableHelper(context);
+        }
+
+        SQLiteDatabase db = mapDataTableHelper.getWritableDatabase();
+        mapDataTableHelper.removePicData(db, null, placeId);
     }
 
 }
