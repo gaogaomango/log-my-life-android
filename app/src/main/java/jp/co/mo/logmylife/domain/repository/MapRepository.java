@@ -111,4 +111,12 @@ public class MapRepository {
         mapDataTableHelper.savePicData(db, null, placeData);
     }
 
+    public void deleteMapPlaceData(Context context, Integer placeId) {
+        // TODO: delete
+    }
+
+    public void deleteMapPicData(Context context, Integer placeId) {
+        // TODO: delete
+    }
+
 }

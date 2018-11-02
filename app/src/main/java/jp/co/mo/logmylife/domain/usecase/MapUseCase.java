@@ -17,6 +17,10 @@ public interface MapUseCase {
 
     public void saveMapPicData(Context context, MapPlaceData placeData);
 
+    public void deleteMapPlaceData(Context context, Integer placeId);
+
+    public void deleteMapPicData(Context context, Integer placeId);
+
     public MapPlaceData getLastInsertedMapData();
 
 }

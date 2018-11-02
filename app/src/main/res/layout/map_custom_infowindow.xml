@@ -202,14 +202,19 @@
                 android:id="@+id/edit_place_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="edit"/>
+                android:text="@string/place_info_edit"/>
             <Button
                 android:id="@+id/update_place_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="update"
+                android:text="@string/place_info_update"
                 android:visibility="gone"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/delete_place_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/place_info_delete"/>
     </LinearLayout>
 
 </ScrollView>

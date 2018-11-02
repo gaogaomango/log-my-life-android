@@ -1,7 +1,9 @@
 package jp.co.mo.logmylife.presentation.view.map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -18,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +54,7 @@ public class MapDetailDialogFragment extends DialogFragment {
     private static final int ADD_IMAGE_BUTTON = NEXT_BUTTON + 1;
     private static final int EDIT_BUTTON = ADD_IMAGE_BUTTON + 1;
     private static final int UPDATE_BUTTON = EDIT_BUTTON + 1;
+    private static final int DELETE_BUTTON = UPDATE_BUTTON + 1;
 
     private MapPlaceData mMapPlaceData;
 
@@ -70,6 +74,7 @@ public class MapDetailDialogFragment extends DialogFragment {
     @BindView(R.id.update_date) TextView updateDate;
     @BindView(R.id.edit_place_info) Button editBtn;
     @BindView(R.id.update_place_info) Button updatePlaceInfo;
+    @BindView(R.id.delete_place_info) Button deletePlaceInfo;
     @BindView(R.id.pictures) ViewPager picsViewPager;
     @BindView(R.id.prev_img) ImageView prevImg;
     @BindView(R.id.next_img) ImageView nextImg;
@@ -162,6 +167,7 @@ public class MapDetailDialogFragment extends DialogFragment {
             updateDate.setText(mMapPlaceData.getUpdateDate());
             editBtn.setOnClickListener(onClickListener(EDIT_BUTTON));
             updatePlaceInfo.setOnClickListener(onClickListener(UPDATE_BUTTON));
+            deletePlaceInfo.setOnClickListener(onClickListener(DELETE_BUTTON));
             changeInfoUpdateStatus(false);
         }
 
@@ -197,6 +203,12 @@ public class MapDetailDialogFragment extends DialogFragment {
                     case UPDATE_BUTTON:
                         updateData();
                         changeInfoUpdateStatus(false);
+                        break;
+                    case DELETE_BUTTON:
+                        showRemoveDialog(v.getContext());
+//
+//                        deleteData();
+//                        dismiss();
                         break;
                     default:
                         break;
@@ -338,6 +350,42 @@ public class MapDetailDialogFragment extends DialogFragment {
         setParams();
     }
 
+    private void showRemoveDialog(final Context context) {
+        AlertDialog.Builder ad = new AlertDialog.Builder(this.getActivity().getApplicationContext());
+        ad.setTitle("ALERT!!");
+        ad.setMessage("DO YOU WANT TO DELETE THIS DIALOG?\nYOU CANNOT UNDO IT.");
+        ad.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(context, "pressed OK", Toast.LENGTH_LONG).show();
+                deleteData();
+                dismiss();
+            }
+        });
+        ad.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(context, "pressed NO", Toast.LENGTH_LONG).show();
+                dismiss();
+            }
+        });
+    }
+
+    private void deleteData() {
+        Logger.error(TAG, "deleteData");
+        // before remove, check dialog
+        if(mMapPlaceData == null) {
+            mUpdateMarker.deleteMarker();
+        }
+
+        if(mMapPlaceData.getId() == null) {
+            mMapPlaceData = null;
+            mUpdateMarker.deleteMarker();
+        } else {
+            mMapUseCase.deleteMapPlaceMarkerData(this.getActivity().getApplicationContext(), mMapPlaceData.getId());
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Logger.debug(TAG, "onActivityResult!!");
@@ -405,7 +453,9 @@ public class MapDetailDialogFragment extends DialogFragment {
     }
 
     interface UpdateMarker {
-        public void updateMarker(MapPlaceData mapPlaceData);
+        void updateMarker(MapPlaceData mapPlaceData);
+
+        void deleteMarker();
     }
 
 }

@@ -10,40 +10,55 @@ import jp.co.mo.logmylife.domain.repository.MapRepository;
 
 public class MapUseCaseImpl extends AbstractUseCase implements MapUseCase {
 
-    private MapRepository mapRepository;
+    private MapRepository mMapRepository;
 
     public MapUseCaseImpl() {
-        mapRepository = new MapRepository();
+        mMapRepository = new MapRepository();
     }
 
     public MapUseCaseImpl(Context context) {
-        mapRepository = new MapRepository(context);
+        mMapRepository = new MapRepository(context);
     }
 
     @Override
     public List<MapPlaceData> getMapPlaceDatas(Context context) {
-        return mapRepository.getInfoWindowDatas(context);
+        return mMapRepository.getInfoWindowDatas(context);
     }
 
     @Override
     public List<MapPlacePicData> getMapPlacePicDatas(Context context, Integer placeId) {
-        return mapRepository.getMapPlacePicDatas(context, placeId);
+        return mMapRepository.getMapPlacePicDatas(context, placeId);
     }
 
 
     @Override
     public void saveMapPlaceData(Context context, MapPlaceData placeData) {
-        mapRepository.saveInfoWindowData(context, placeData);
+        mMapRepository.saveInfoWindowData(context, placeData);
     }
 
     @Override
     public void saveMapPicData(Context context, MapPlaceData placeData) {
-        mapRepository.savePicData(context, placeData);
+        mMapRepository.savePicData(context, placeData);
+    }
+
+    public void deleteMapPlaceMarkerData(Context context, Integer placeId) {
+        deleteMapPlaceData(context, placeId);
+        deleteMapPicData(context, placeId);
+    }
+
+    @Override
+    public void deleteMapPlaceData(Context context, Integer placeId) {
+        mMapRepository.deleteMapPlaceData(context, placeId);
+    }
+
+    @Override
+    public void deleteMapPicData(Context context, Integer placeId) {
+        mMapRepository.deleteMapPicData(context, placeId);
     }
 
     @Override
     public MapPlaceData getLastInsertedMapData() {
-        return mapRepository.getLastInsertedMapData();
+        return mMapRepository.getLastInsertedMapData();
     }
 
 }

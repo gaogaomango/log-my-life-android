@@ -8,6 +8,9 @@
     <string name="url">URL</string>
     <string name="detail">DETAIL</string>
     <string name="add_image">ADD IMAGE</string>
+    <string name="place_info_edit">EDIT</string>
+    <string name="place_info_update">UPDATE</string>
+    <string name="place_info_delete">DELETE</string>
 
 
     <string name="dialog_copy">copy</string>
