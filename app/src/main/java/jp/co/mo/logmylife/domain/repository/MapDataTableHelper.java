@@ -203,10 +203,13 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
         setDate(values, COLUMN_NAME_CREATE_DATE, data.getCreateDate());
         setDate(values, COLUMN_NAME_UPDATE_DATE, data.getUpdateDate());
 
+        // TODO: recognize and check user id.
+
         db.insert(TABLE_NAME, null, values);
     }
 
     public void removeData(SQLiteDatabase db, String userId, Integer placeId) {
+        // TODO: recognize and check user id.
         if(placeId == null) {
             return;
         }
@@ -215,6 +218,7 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
 
 
     public void savePicData(SQLiteDatabase db, String userId, MapPlaceData data) {
+        // TODO: recognize and check user id.
         if(data.getPicList() == null || data.getPicList().isEmpty()) {
             return;
         }
