@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Explode;
 import android.transition.Slide;
 import android.view.View;
 import android.view.Window;
@@ -19,11 +20,17 @@ import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.DateUtil;
+import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
+import jp.co.mo.logmylife.presentation.view.main.MainActivity;
+import jp.co.mo.logmylife.presentation.view.map.MapActivity;
 
-public class TaskHomeActivity extends AppCompatActivity {
+public class TaskHomeActivity extends AbstractBaseActivity {
+
+    private static final String TAG = TaskHomeActivity.class.getSimpleName();
 
     @BindView(R.id.scrollView) NestedScrollView mScrollView;
     @BindView(R.id.loader) ProgressBar mLoader;
@@ -47,6 +54,7 @@ public class TaskHomeActivity extends AppCompatActivity {
 
     @Override
     protected  void onCreate(Bundle savedInstanceState) {
+        Logger.debug(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.task_home);
@@ -56,11 +64,12 @@ public class TaskHomeActivity extends AppCompatActivity {
     }
 
     public void openAddTask(View v) {
-        Intent i = new Intent(this, AddTaskActivity.class);
-        startActivity(i);
+        Logger.debug(TAG, "openAddTask");
+        startIntentWithSlideAnimation(this, AddTaskActivity.class);
     }
 
     public void populateDate() {
+        Logger.debug(TAG, "populateDate");
         mTaskTableHelper = new TaskTableHelper(this);
         mScrollView.setVisibility(View.GONE);
         mLoader.setVisibility(View.VISIBLE);
@@ -70,16 +79,13 @@ public class TaskHomeActivity extends AppCompatActivity {
     }
 
     public void finishActivity(View v) {
+        Logger.debug(TAG, "finishActivity");
         onBackPressed();
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
     public void onResume() {
+        Logger.debug(TAG, "onResume");
         super.onResume();
 
         populateDate();
@@ -169,7 +175,7 @@ public class TaskHomeActivity extends AppCompatActivity {
                     Intent i = new Intent(getApplicationContext(), AddTaskActivity.class);
                     i.putExtra(KEY_IS_UPDATE, true);
                     i.putExtra(KEY_ID, dataList.get(+position).get(KEY_ID));
-                    startActivity(i);
+                    startIntentWithSlideAnimation(TaskHomeActivity.this, i);
                 }
             });
         }

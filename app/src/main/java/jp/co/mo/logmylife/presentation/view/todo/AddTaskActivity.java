@@ -3,7 +3,6 @@ package jp.co.mo.logmylife.presentation.view.todo;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -16,11 +15,13 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.DateUtil;
+import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
 
-public class AddTaskActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class AddTaskActivity extends AbstractBaseActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
     private static final String FRAGMENT_START_DATE_PICKER_DIALOG_TAG = "startDatepickerdialog";
@@ -42,13 +43,12 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.debug(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.task_add_new);
-
         ButterKnife.bind(this);
 
         // TODO: refuctaring
-
         mTaskTableHelper = new TaskTableHelper(getApplicationContext(), null, null, 0);
         mIntent = getIntent();
         mIsUpdate = mIntent.getBooleanExtra(TaskHomeActivity.KEY_IS_UPDATE, false);
@@ -67,6 +67,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     }
 
     private void initUpdate() {
+        Logger.debug(TAG, "initUpdate");
         mId = mIntent.getStringExtra(TaskHomeActivity.KEY_ID);
         // TODO: change to constant
         mToolbarTaskAddTitle.setText("Update");
@@ -86,10 +87,12 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     }
 
     public void closeAddTask(View v) {
+        Logger.debug(TAG, "closeAddTask");
         finish();
     }
 
     public void doneAddTask(View v) {
+        Logger.debug(TAG, "doneAddTask");
         int errorStep = 0;
         mNameFinal = mTaskName.getText().toString();
         mDateFinal = mTaskDate.getText().toString();
@@ -119,6 +122,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     }
 
     public void showStartDatePicker(View v) {
+        Logger.debug(TAG, "showStartDatePicker");
         mDPD = DatePickerDialog.newInstance(AddTaskActivity.this, mStartYear, mStartMonth, mStartDay);
         mDPD.setOnDateSetListener(this);
         mDPD.show(getFragmentManager(), FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
@@ -126,6 +130,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     public void onResume() {
+        Logger.debug(TAG, "onResume");
         super.onResume();
         mDPD = (DatePickerDialog) getFragmentManager().findFragmentByTag(FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
         if(mDPD != null) {
@@ -135,6 +140,7 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+        Logger.debug(TAG, "onDateSet");
         mStartYear = year;
         mStartMonth = monthOfYear;
         mStartDay = dayOfMonth;

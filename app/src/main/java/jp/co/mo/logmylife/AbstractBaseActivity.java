@@ -1,10 +1,14 @@
 package jp.co.mo.logmylife;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+
 
 public class AbstractBaseActivity extends AppCompatActivity {
 
@@ -15,6 +19,15 @@ public class AbstractBaseActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         checkSelfPermission();
+    }
+
+    protected void startIntentWithSlideAnimation(Activity activity, Class clazz) {
+        Intent intent = new Intent(activity, clazz);
+        this.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity, null).toBundle());
+    }
+
+    protected void startIntentWithSlideAnimation(Activity activity, Intent intent) {
+        this.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(activity, null).toBundle());
     }
 
     protected void checkSelfPermission() {

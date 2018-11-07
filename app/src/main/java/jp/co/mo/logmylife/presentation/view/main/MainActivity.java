@@ -5,10 +5,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.Explode;
-import android.transition.Slide;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -57,20 +54,15 @@ public class MainActivity extends AbstractBaseActivity {
         mMenuMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startIntentWithAnimation(MainActivity.this, MapActivity.class);
+                startIntentWithSlideAnimation(MainActivity.this, MapActivity.class);
             }
         });
         mMenuTodo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startIntentWithAnimation(MainActivity.this, TaskHomeActivity.class);
+                startIntentWithSlideAnimation(MainActivity.this, TaskHomeActivity.class);
             }
         });
-    }
-
-    private void startIntentWithAnimation(Context context, Class clazz) {
-        Intent intent = new Intent(context, clazz);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, null).toBundle());
     }
 
     @Override
