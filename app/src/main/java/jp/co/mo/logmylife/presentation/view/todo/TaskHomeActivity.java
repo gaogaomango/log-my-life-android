@@ -66,6 +66,10 @@ public class TaskHomeActivity extends AppCompatActivity {
         loadTask.execute();
     }
 
+    public void finishActivity(View v) {
+        finish();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
