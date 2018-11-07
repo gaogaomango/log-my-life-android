@@ -59,7 +59,7 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
     protected static final int COLUMN_NAME_PIC_CREATE_DATE_NUM = COLUMN_NAME_PIC_FILE_PATH_NUM + 1;
     protected static final int COLUMN_NAME_PIC_UPDATE_DATE_NUM = COLUMN_NAME_PIC_CREATE_DATE_NUM + 1;
 
-    private static final String SQL_CREATE_ENTRIES =
+    public static final String CREATE_MAP_INFO_TABLE_SQL =
             "CREATE TABLE  IF NOT EXISTS " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + " INTEGER PRIMARY KEY," +
                     COLUMN_NAME_USER_ID + " TEXT," +
@@ -73,10 +73,10 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
                     COLUMN_NAME_CREATE_DATE + " DATETIME default current_timestamp," +
                     COLUMN_NAME_UPDATE_DATE + "  DATETIME default current_timestamp)";
 
-    private static final String SQL_DELETE_ENTRIES =
+    public static final String DROP_MAP_INFO_TABLE_SQL =
             "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    private static final String SQL_CREATE_PIC_ENTRIES =
+    public static final String CREATE_MAP_PIC_INFO_TABLE_SQL =
             "CREATE TABLE  IF NOT EXISTS " + PIC_TABLE_NAME + " (" +
                     COLUMN_NAME_PIC_ID + " INTEGER PRIMARY KEY," +
                     COLUMN_NAME_PIC_MAP_PLACE_ID + " INTEGER NOT NULL," +
@@ -85,11 +85,11 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
                     COLUMN_NAME_PIC_CREATE_DATE + " DATETIME default current_timestamp," +
                     COLUMN_NAME_PIC_UPDATE_DATE + "  DATETIME default current_timestamp)";
 
-    private static final String SQL_DELETE_PIC_ENTRIES =
+    public static final String DROP_MAP_PIC_INFO_TABLE_SQL =
             "DROP TABLE IF EXISTS " + PIC_TABLE_NAME;
 
 
-    private static final String SQL_LAST_INSERTED_RECORD_ENTRIES =
+    public static final String SQL_LAST_INSERTED_RECORD_ENTRIES =
             "SELECT " + COLUMN_NAME_ID + ", " +
                     COLUMN_NAME_USER_ID + ", " +
                     COLUMN_NAME_TITLE + ", " +
@@ -106,27 +106,6 @@ public class MapDataTableHelper extends AbstractDataTableHelper {
 
     public MapDataTableHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String[] queries = { SQL_CREATE_ENTRIES, SQL_CREATE_PIC_ENTRIES };
-        for(String query : queries) {
-            db.execSQL(
-                    query
-            );
-        }
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String[] queries = { SQL_DELETE_ENTRIES, SQL_DELETE_PIC_ENTRIES };
-        for(String query : queries) {
-            db.execSQL(
-                    query
-            );
-        }
-        onCreate(db);
     }
 
     public MapPlaceData getLastInsertedRecord(SQLiteDatabase db) {

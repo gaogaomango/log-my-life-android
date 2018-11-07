@@ -16,11 +16,30 @@ public class AbstractDataTableHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        String[] queries = {
+                MapDataTableHelper.CREATE_MAP_INFO_TABLE_SQL,
+                MapDataTableHelper.CREATE_MAP_PIC_INFO_TABLE_SQL,
+                TaskTableHelper.CREATE_TASK_TABLE_SQL
+        };
+        for(String query : queries) {
+            db.execSQL(
+                    query
+            );
+        }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        String[] queries = {
+                MapDataTableHelper.DROP_MAP_INFO_TABLE_SQL,
+                MapDataTableHelper.DROP_MAP_PIC_INFO_TABLE_SQL,
+                TaskTableHelper.DROP_TASK_TABLE_SQL
+        };
+        for(String query : queries) {
+            db.execSQL(
+                    query
+            );
+        }
+        onCreate(db);
     }
 }
