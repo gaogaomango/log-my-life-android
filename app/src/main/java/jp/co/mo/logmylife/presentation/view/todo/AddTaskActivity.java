@@ -1,8 +1,8 @@
 package jp.co.mo.logmylife.presentation.view.todo;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,6 +12,7 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,15 +21,14 @@ import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
-import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
+import jp.co.mo.logmylife.domain.usecase.TaskUsecaseImpl;
 
 public class AddTaskActivity extends AbstractBaseActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String TAG = AddTaskActivity.class.getSimpleName();
     private static final String FRAGMENT_START_DATE_PICKER_DIALOG_TAG = "startDatepickerdialog";
 
-    // TODO: move to usecase
-    private TaskTableHelper mTaskTableHelper;
+    private TaskUsecaseImpl mTaskUsecase;
     private DatePickerDialog mDPD;
     private int mStartYear = 0, mStartMonth = 0, mStartDay = 0;
     private String mDateFinal;
@@ -49,8 +49,7 @@ public class AddTaskActivity extends AbstractBaseActivity implements DatePickerD
         setContentView(R.layout.task_add_new);
         ButterKnife.bind(this);
 
-        // TODO: refuctaring
-        mTaskTableHelper = new TaskTableHelper(getApplicationContext(), null, null, 0);
+        mTaskUsecase = new TaskUsecaseImpl(this);
         mIntent = getIntent();
         mIsUpdate = mIntent.getBooleanExtra(TaskDataRepository.KEY_IS_UPDATE, false);
 
@@ -70,20 +69,19 @@ public class AddTaskActivity extends AbstractBaseActivity implements DatePickerD
     private void initUpdate() {
         Logger.debug(TAG, "initUpdate");
         mId = mIntent.getStringExtra(TaskDataRepository.KEY_ID);
-        // TODO: change to constant
-        mToolbarTaskAddTitle.setText("Update");
+        mToolbarTaskAddTitle.setText(this.getResources().getText(R.string.todo_update));
 
-        // TODO: move to usecase and repository
-        Cursor task = mTaskTableHelper.getDataSpecific(mId);
-        if(task != null) {
-            task.moveToFirst();
-
-            mTaskName.setText(task.getString(1).toString());
-            Calendar cal = DateUtil.Epoch2Calender(task.getString(2).toString());
-            mStartYear = cal.get(Calendar.YEAR);
-            mStartMonth = cal.get(Calendar.MONTH);
-            mStartDay = cal.get(Calendar.DAY_OF_MONTH);
-            mTaskDate.setText(DateUtil.Epoch2DateString(task.getString(2).toString(), DateUtil.FORMAT_DIVIDE_SLUSH_DDMMYYY));
+        Map<String, Object> data = mTaskUsecase.getDataSpecific(mId);
+        if(data != null) {
+            mTaskName.setText((String) data.get(TaskDataRepository.KEY_TASK_NAME));
+            String calStr = (String) data.get(TaskDataRepository.KEY_CALENDAR);
+            if(!TextUtils.isEmpty(calStr)) {
+                Calendar cal = DateUtil.Epoch2Calender(calStr);
+                mStartYear = cal.get(Calendar.YEAR);
+                mStartMonth = cal.get(Calendar.MONTH);
+                mStartDay = cal.get(Calendar.DAY_OF_MONTH);
+                mTaskDate.setText(DateUtil.Epoch2DateString(calStr, DateUtil.FORMAT_DIVIDE_SLUSH_DDMMYYY));
+            }
         }
     }
 
@@ -110,10 +108,10 @@ public class AddTaskActivity extends AbstractBaseActivity implements DatePickerD
 
         if(errorStep == 0) {
             if (mIsUpdate) {
-                mTaskTableHelper.updateContact(mId, mNameFinal, mDateFinal);
+                mTaskUsecase.updateContact(mId, mNameFinal, mDateFinal);
                 Toast.makeText(getApplicationContext(), "Task Updated.", Toast.LENGTH_SHORT).show();
             } else {
-                mTaskTableHelper.insertContact(mNameFinal, mDateFinal);
+                mTaskUsecase.insertContact(mNameFinal, mDateFinal);
                 Toast.makeText(getApplicationContext(), "Task Added.", Toast.LENGTH_SHORT).show();
             }
             finish();

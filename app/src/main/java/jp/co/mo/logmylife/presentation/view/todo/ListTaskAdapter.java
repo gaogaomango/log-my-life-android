@@ -12,6 +12,7 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
@@ -19,9 +20,9 @@ import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
 public class ListTaskAdapter extends BaseAdapter {
 
     private Context mContext;
-    private ArrayList<HashMap<String, String>> mData;
+    private ArrayList<Map<String, String>> mData;
 
-    public ListTaskAdapter(Context context, ArrayList<HashMap<String, String>> data) {
+    public ListTaskAdapter(Context context, ArrayList<Map<String, String>> data) {
         this.mContext = context;
         this.mData = data;
     }
@@ -60,7 +61,7 @@ public class ListTaskAdapter extends BaseAdapter {
         holder.taskName.setId(position);
         holder.taskDate.setId(position);
 
-        HashMap<String, String> song = mData.get(position);
+        HashMap<String, String> song = (HashMap<String, String>) mData.get(position);
 
         try{
             holder.taskName.setText(song.get(TaskDataRepository.KEY_TASK));

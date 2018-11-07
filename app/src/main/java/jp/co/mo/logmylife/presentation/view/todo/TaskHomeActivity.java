@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,9 +36,9 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
     private TaskUsecaseImpl mTaskUsecase;
 
-    private ArrayList<HashMap<String, String>> mTodayList = new ArrayList<>();
-    private ArrayList<HashMap<String, String>> mTomorrowList = new ArrayList<>();
-    private ArrayList<HashMap<String, String>> mUpcomingList = new ArrayList<>();
+    private ArrayList<Map<String, String>> mTodayList = new ArrayList<>();
+    private ArrayList<Map<String, String>> mTomorrowList = new ArrayList<>();
+    private ArrayList<Map<String, String>> mUpcomingList = new ArrayList<>();
 
     @Override
     protected  void onCreate(Bundle savedInstanceState) {
@@ -126,7 +126,7 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
         }
 
-        private void loadListView(ListView listView, final ArrayList<HashMap<String, String>> dataList) {
+        private void loadListView(ListView listView, final ArrayList<Map<String, String>> dataList) {
             ListTaskAdapter adapter = new ListTaskAdapter(getApplicationContext(), dataList);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

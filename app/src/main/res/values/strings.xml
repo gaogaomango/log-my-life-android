@@ -3,6 +3,9 @@
     <string name="menu_map">Map Activity</string>
     <string name="menu_todo">TODO Activity</string>
     <string name="logout">Logout</string>
+
+
+    <!-- ABOUT MAP -->
     <string name="dialog_title">TITLE</string>
     <string name="dialog_type">TYPE</string>
     <string name="dialog_type_detail">RESTAURANT_TYPE</string>
@@ -13,9 +16,13 @@
     <string name="place_info_update">UPDATE</string>
     <string name="place_info_delete">DELETE</string>
 
-
     <string name="dialog_copy">copy</string>
     <string name="dialog_exit">exit</string>
     <string name="create_date">create_date</string>
     <string name="update_date">update_date</string>
+
+
+    <!-- ABOUT TODO -->
+    <string name="todo_update">Update</string>
+
 </resources>
