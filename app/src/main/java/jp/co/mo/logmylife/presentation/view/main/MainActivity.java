@@ -13,6 +13,7 @@ import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.Logger;
 import jp.co.mo.logmylife.presentation.view.map.MapActivity;
+import jp.co.mo.logmylife.presentation.view.todo.TaskHomeActivity;
 
 public class MainActivity extends AbstractBaseActivity {
 
@@ -23,6 +24,8 @@ public class MainActivity extends AbstractBaseActivity {
     private Context mContext;
     @BindView(R.id.logout_button) Button logoutButton;
     @BindView(R.id.menu_map) Button menuMap;
+    @BindView(R.id.menu_todo) Button menuTodo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,13 @@ public class MainActivity extends AbstractBaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(intent);
+            }
+        });
+        menuTodo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TaskHomeActivity.class);
                 startActivity(intent);
             }
         });

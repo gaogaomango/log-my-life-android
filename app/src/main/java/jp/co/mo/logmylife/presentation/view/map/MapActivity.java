@@ -276,4 +276,9 @@ public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMar
             mMarker.setTag(mapPlaceData);
         }
     }
+
+    @Override
+    public void deleteMarker() {
+        // TODO: delete marker
+    }
 }

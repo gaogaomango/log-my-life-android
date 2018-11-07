@@ -59,6 +59,10 @@
             <!--</intent-filter>-->
         <!--</activity>-->
         <activity android:name=".presentation.view.map.MapActivity"></activity>
+
+        <activity android:name=".presentation.view.todo.TaskHomeActivity" />
+        <activity android:name=".presentation.view.todo.AddTaskActivity" />
+
     </application>
 
 </manifest>

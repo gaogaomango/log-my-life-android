@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LogMyLife</string>
     <string name="menu_map">Map Activity</string>
+    <string name="menu_todo">TODO Activity</string>
     <string name="logout">Logout</string>
     <string name="dialog_title">TITLE</string>
     <string name="dialog_type">TYPE</string>
