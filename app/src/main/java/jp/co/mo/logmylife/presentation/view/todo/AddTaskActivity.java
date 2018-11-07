@@ -26,19 +26,19 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     private static final String FRAGMENT_START_DATE_PICKER_DIALOG_TAG = "startDatepickerdialog";
 
     // TODO: move to usecase
-    TaskTableHelper mydb;
-    DatePickerDialog dpd;
-    int startYear = 0, startMonth = 0, startDay = 0;
-    String dateFinal;
-    String nameFinal;
+    private TaskTableHelper mTaskTableHelper;
+    private DatePickerDialog mDPD;
+    private int mStartYear = 0, mStartMonth = 0, mStartDay = 0;
+    private String mDateFinal;
+    private String mNameFinal;
 
-    Intent intent;
-    Boolean isUpdate;
-    String id;
+    private Intent mIntent;
+    private Boolean mIsUpdate;
+    private String mId;
 
-    @BindView(R.id.toolbar_task_add_title) TextView toolbarTaskAddTitle;
-    @BindView(R.id.task_name) EditText taskName;
-    @BindView(R.id.task_date) EditText taskDate;
+    @BindView(R.id.toolbar_task_add_title) TextView mToolbarTaskAddTitle;
+    @BindView(R.id.task_name) EditText mTaskName;
+    @BindView(R.id.task_date) EditText mTaskDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,39 +49,39 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 
         // TODO: refuctaring
 
-        mydb = new TaskTableHelper(getApplicationContext(), null, null, 0);
-        intent = getIntent();
-        isUpdate = intent.getBooleanExtra(TaskHomeActivity.KEY_IS_UPDATE, false);
+        mTaskTableHelper = new TaskTableHelper(getApplicationContext(), null, null, 0);
+        mIntent = getIntent();
+        mIsUpdate = mIntent.getBooleanExtra(TaskHomeActivity.KEY_IS_UPDATE, false);
 
-        dateFinal = DateUtil.todayDateString();
+        mDateFinal = DateUtil.todayDateString();
         Date yourDate = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(yourDate);
-        startYear = cal.get(Calendar.YEAR);
-        startMonth = cal.get(Calendar.MONTH);
-        startDay = cal.get(Calendar.DAY_OF_MONTH);
+        mStartYear = cal.get(Calendar.YEAR);
+        mStartMonth = cal.get(Calendar.MONTH);
+        mStartDay = cal.get(Calendar.DAY_OF_MONTH);
 
-        if (isUpdate) {
+        if (mIsUpdate) {
             initUpdate();
         }
     }
 
     private void initUpdate() {
-        id = intent.getStringExtra(TaskHomeActivity.KEY_ID);
+        mId = mIntent.getStringExtra(TaskHomeActivity.KEY_ID);
         // TODO: change to constant
-        toolbarTaskAddTitle.setText("Update");
+        mToolbarTaskAddTitle.setText("Update");
 
         // TODO: move to usecase and repository
-        Cursor task = mydb.getDataSpecific(id);
+        Cursor task = mTaskTableHelper.getDataSpecific(mId);
         if(task != null) {
             task.moveToFirst();
 
-            taskName .setText(task.getString(1).toString());
+            mTaskName.setText(task.getString(1).toString());
             Calendar cal = DateUtil.Epoch2Calender(task.getString(2).toString());
-            startYear = cal.get(Calendar.YEAR);
-            startMonth = cal.get(Calendar.MONTH);
-            startDay = cal.get(Calendar.DAY_OF_MONTH);
-            taskDate.setText(DateUtil.Epoch2DateString(task.getString(2).toString(), DateUtil.FORMAT_DIVIDE_SLUSH_DDMMYYY));
+            mStartYear = cal.get(Calendar.YEAR);
+            mStartMonth = cal.get(Calendar.MONTH);
+            mStartDay = cal.get(Calendar.DAY_OF_MONTH);
+            mTaskDate.setText(DateUtil.Epoch2DateString(task.getString(2).toString(), DateUtil.FORMAT_DIVIDE_SLUSH_DDMMYYY));
         }
     }
 
@@ -91,25 +91,25 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
 
     public void doneAddTask(View v) {
         int errorStep = 0;
-        nameFinal = taskName.getText().toString();
-        dateFinal = taskDate.getText().toString();
+        mNameFinal = mTaskName.getText().toString();
+        mDateFinal = mTaskDate.getText().toString();
 
-        if (nameFinal.trim().length() < 1) {
+        if (mNameFinal.trim().length() < 1) {
             errorStep++;
-            taskName.setError("Provide a task name.");
+            mTaskName.setError("Provide a task name.");
         }
 
-        if(dateFinal.trim().length() < 4) {
+        if(mDateFinal.trim().length() < 4) {
             errorStep++;
-            taskDate.setError("Provide a specific date");
+            mTaskDate.setError("Provide a specific date");
         }
 
         if(errorStep == 0) {
-            if (isUpdate) {
-                mydb.updateContact(id, nameFinal, dateFinal);
+            if (mIsUpdate) {
+                mTaskTableHelper.updateContact(mId, mNameFinal, mDateFinal);
                 Toast.makeText(getApplicationContext(), "Task Updated.", Toast.LENGTH_SHORT).show();
             } else {
-                mydb.insertContact(nameFinal, dateFinal);
+                mTaskTableHelper.insertContact(mNameFinal, mDateFinal);
                 Toast.makeText(getApplicationContext(), "Task Added.", Toast.LENGTH_SHORT).show();
             }
             finish();
@@ -119,30 +119,30 @@ public class AddTaskActivity extends AppCompatActivity implements DatePickerDial
     }
 
     public void showStartDatePicker(View v) {
-        dpd = DatePickerDialog.newInstance(AddTaskActivity.this, startYear, startMonth, startDay);
-        dpd.setOnDateSetListener(this);
-        dpd.show(getFragmentManager(), FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
+        mDPD = DatePickerDialog.newInstance(AddTaskActivity.this, mStartYear, mStartMonth, mStartDay);
+        mDPD.setOnDateSetListener(this);
+        mDPD.show(getFragmentManager(), FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        dpd = (DatePickerDialog) getFragmentManager().findFragmentByTag(FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
-        if(dpd != null) {
-            dpd.setOnDateSetListener(this);
+        mDPD = (DatePickerDialog) getFragmentManager().findFragmentByTag(FRAGMENT_START_DATE_PICKER_DIALOG_TAG);
+        if(mDPD != null) {
+            mDPD.setOnDateSetListener(this);
         }
     }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        startYear = year;
-        startMonth = monthOfYear;
-        startDay = dayOfMonth;
-        int monthAddOne = startMonth + 1;
-        String date = (startDay < 10 ? "0" + startDay : "" + startDay) +
+        mStartYear = year;
+        mStartMonth = monthOfYear;
+        mStartDay = dayOfMonth;
+        int monthAddOne = mStartMonth + 1;
+        String date = (mStartDay < 10 ? "0" + mStartDay : "" + mStartDay) +
                 "/" + (monthAddOne < 10 ? "0" + monthAddOne : "" + monthAddOne) +
-                "/" + startYear;
-        taskDate.setText(date);
+                "/" + mStartYear;
+        mTaskDate.setText(date);
     }
 
 }

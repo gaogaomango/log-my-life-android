@@ -6,7 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Slide;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -23,33 +25,34 @@ import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
 
 public class TaskHomeActivity extends AppCompatActivity {
 
-    @BindView(R.id.scrollView) NestedScrollView scrollView;
-    @BindView(R.id.loader) ProgressBar loader;
-    @BindView(R.id.taskListToday) NoScrollListView taskListToday;
-    @BindView(R.id.taskListTomorrow) NoScrollListView taskListTomorow;
-    @BindView(R.id.taskListUpcoming) NoScrollListView taskListUpcoming;
-    @BindView(R.id.todayText) TextView todayText;
-    @BindView(R.id.tomorrowText) TextView tomorrowText;
-    @BindView(R.id.upcomingText) TextView upcomingText;
+    @BindView(R.id.scrollView) NestedScrollView mScrollView;
+    @BindView(R.id.loader) ProgressBar mLoader;
+    @BindView(R.id.taskListToday) NoScrollListView mTaskListToday;
+    @BindView(R.id.taskListTomorrow) NoScrollListView mTaskListTomorow;
+    @BindView(R.id.taskListUpcoming) NoScrollListView mTaskListUpcoming;
+    @BindView(R.id.todayText) TextView mTodayText;
+    @BindView(R.id.tomorrowText) TextView mTomorrowText;
+    @BindView(R.id.upcomingText) TextView mUpcomingText;
 
-    TaskTableHelper mydb;
+    private TaskTableHelper mTaskTableHelper;
 
-    ArrayList<HashMap<String, String>> todayList = new ArrayList<>();
-    ArrayList<HashMap<String, String>> tomorrowList = new ArrayList<>();
-    ArrayList<HashMap<String, String>> upcomingList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> mTodayList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> mTomorrowList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> mUpcomingList = new ArrayList<>();
 
-    public static String KEY_ID = "id";
+    public static String KEY_ID = "mId";
     public static String KEY_TASK = "task";
     public static String KEY_DATE = "dateStr";
-    public static String KEY_IS_UPDATE = "isUpdate";
+    public static String KEY_IS_UPDATE = "mIsUpdate";
 
     @Override
     protected  void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.task_home);
         ButterKnife.bind(this);
 
-        mydb = new TaskTableHelper(this);
+        mTaskTableHelper = new TaskTableHelper(this);
     }
 
     public void openAddTask(View v) {
@@ -58,16 +61,21 @@ public class TaskHomeActivity extends AppCompatActivity {
     }
 
     public void populateDate() {
-        mydb = new TaskTableHelper(this);
-        scrollView.setVisibility(View.GONE);
-        loader.setVisibility(View.VISIBLE);
+        mTaskTableHelper = new TaskTableHelper(this);
+        mScrollView.setVisibility(View.GONE);
+        mLoader.setVisibility(View.VISIBLE);
 
         LoadTask loadTask = new LoadTask();
         loadTask.execute();
     }
 
     public void finishActivity(View v) {
-        finish();
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -83,9 +91,9 @@ public class TaskHomeActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            todayList.clear();
-            tomorrowList.clear();
-            upcomingList.clear();
+            mTodayList.clear();
+            mTomorrowList.clear();
+            mUpcomingList.clear();
         }
 
         @Override
@@ -93,46 +101,46 @@ public class TaskHomeActivity extends AppCompatActivity {
             String xml = "";
 
             // TODO: move to usecase and repository;
-            Cursor today = mydb.getDataToday();
-            loadDataList(today, todayList);
+            Cursor today = mTaskTableHelper.getDataToday();
+            loadDataList(today, mTodayList);
 
             // TODO: move to usecase and repository;
-            Cursor tmr = mydb.getDataTomorrow();
-            loadDataList(tmr, tomorrowList);
+            Cursor tmr = mTaskTableHelper.getDataTomorrow();
+            loadDataList(tmr, mTomorrowList);
 
             // TODO: move to usecase and repository;
-            Cursor upcoming = mydb.getDataUpcoming();
-            loadDataList(upcoming, upcomingList);
+            Cursor upcoming = mTaskTableHelper.getDataUpcoming();
+            loadDataList(upcoming, mUpcomingList);
 
             return xml;
         }
 
         @Override
         protected void onPostExecute(String xml) {
-            loadListView(taskListToday, todayList);
-            loadListView(taskListTomorow, tomorrowList);
-            loadListView(taskListUpcoming, upcomingList);
+            loadListView(mTaskListToday, mTodayList);
+            loadListView(mTaskListTomorow, mTomorrowList);
+            loadListView(mTaskListUpcoming, mUpcomingList);
 
-            if(todayList.size() > 0) {
-                todayText.setVisibility(View.VISIBLE);
+            if(mTodayList.size() > 0) {
+                mTodayText.setVisibility(View.VISIBLE);
             } else {
-                todayText.setVisibility(View.GONE);
+                mTodayText.setVisibility(View.GONE);
             }
 
-            if(tomorrowList.size() > 0) {
-                tomorrowText.setVisibility(View.VISIBLE);
+            if(mTomorrowList.size() > 0) {
+                mTomorrowText.setVisibility(View.VISIBLE);
             } else {
-                tomorrowText.setVisibility(View.GONE);
+                mTomorrowText.setVisibility(View.GONE);
             }
 
-            if(upcomingList.size() > 0) {
-                upcomingText.setVisibility(View.VISIBLE);
+            if(mUpcomingList.size() > 0) {
+                mUpcomingText.setVisibility(View.VISIBLE);
             } else {
-                upcomingText.setVisibility(View.GONE);
+                mUpcomingText.setVisibility(View.GONE);
             }
 
-            loader.setVisibility(View.GONE);
-            scrollView.setVisibility(View.VISIBLE);
+            mLoader.setVisibility(View.GONE);
+            mScrollView.setVisibility(View.VISIBLE);
 
         }
 

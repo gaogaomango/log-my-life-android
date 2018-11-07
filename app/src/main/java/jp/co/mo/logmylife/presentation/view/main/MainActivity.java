@@ -1,9 +1,14 @@
 package jp.co.mo.logmylife.presentation.view.main;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.Explode;
+import android.transition.Slide;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -22,9 +27,10 @@ public class MainActivity extends AbstractBaseActivity {
 //    private FirebaseAuth mAuth;
 
     private Context mContext;
-    @BindView(R.id.logout_button) Button logoutButton;
-    @BindView(R.id.menu_map) Button menuMap;
-    @BindView(R.id.menu_todo) Button menuTodo;
+    private Activity mActivity;
+    @BindView(R.id.logout_button) Button mLogoutButton;
+    @BindView(R.id.menu_map) Button mMenuMap;
+    @BindView(R.id.menu_todo) Button mMenuTodo;
 
 
     @Override
@@ -33,10 +39,11 @@ public class MainActivity extends AbstractBaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mContext = this;
+        mActivity = this;
 
 //        mAuth = FirebaseAuth.getInstance();
 
-        logoutButton.setOnClickListener(new View.OnClickListener() {
+        mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                mAuth.signOut();
@@ -47,22 +54,24 @@ public class MainActivity extends AbstractBaseActivity {
                 Toast.makeText(mContext, "It's stopped for now", Toast.LENGTH_LONG).show();
             }
         });
-        menuMap.setOnClickListener(new View.OnClickListener() {
+        mMenuMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(intent);
+                startIntentWithAnimation(MainActivity.this, MapActivity.class);
             }
         });
-        menuTodo.setOnClickListener(new View.OnClickListener() {
+        mMenuTodo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TaskHomeActivity.class);
-                startActivity(intent);
+                startIntentWithAnimation(MainActivity.this, TaskHomeActivity.class);
             }
         });
     }
 
+    private void startIntentWithAnimation(Context context, Class clazz) {
+        Intent intent = new Intent(context, clazz);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, null).toBundle());
+    }
 
     @Override
     public void onPause() {
