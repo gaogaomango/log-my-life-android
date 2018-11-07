@@ -10,7 +10,6 @@
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
@@ -22,6 +21,14 @@
             android:orientation="horizontal"
             android:weightSum="1"
             android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:padding="5dp"
+                android:layout_margin="5dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_action_back"
+                android:onClick="finishActivity"/>
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -62,6 +69,7 @@
         android:layout_gravity="fill_vertical"
         android:clipToPadding="false"
         android:visibility="visible"
+        android:background="@android:color/white"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -76,12 +84,12 @@
                 android:padding="10dp"
                 android:text="Today"
                 android:textSize="16sp"
-                android:textColor="#CCCCCC"/>
+                android:textColor="@android:color/secondary_text_light"/>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="@android:color/holo_red_light"
                 android:descendantFocusability="blocksDescendants"
                 android:layout_marginRight="12dp"
                 android:layout_marginLeft="12dp">
@@ -90,7 +98,7 @@
                     android:id="@+id/taskListToday"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="?attr/colorPrimary"
+                    android:background="@android:color/holo_red_light"
                     android:divider="#333232"
                     android:dividerHeight="1dp"
                     android:visibility="visible"
@@ -104,12 +112,12 @@
                 android:padding="10dp"
                 android:text="Tomorrow"
                 android:textSize="16sp"
-                android:textColor="#CCCCCC"/>
+                android:textColor="@android:color/secondary_text_light"/>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="@android:color/holo_blue_light"
                 android:descendantFocusability="blocksDescendants"
                 android:layout_marginRight="12dp"
                 android:layout_marginLeft="12dp">
@@ -118,7 +126,7 @@
                     android:id="@+id/taskListTomorrow"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="?attr/colorPrimary"
+                    android:background="@android:color/holo_blue_light"
                     android:divider="#333232"
                     android:dividerHeight="1dp"
                     android:visibility="visible"
@@ -132,12 +140,12 @@
                 android:padding="10dp"
                 android:text="Upcoming Next"
                 android:textSize="16sp"
-                android:textColor="#CCCCCC"/>
+                android:textColor="@android:color/secondary_text_light"/>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="@android:color/holo_blue_light"
                 android:descendantFocusability="blocksDescendants"
                 android:layout_marginRight="12dp"
                 android:layout_marginLeft="12dp"
@@ -147,7 +155,7 @@
                     android:id="@+id/taskListUpcoming"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="?attr/colorPrimary"
+                    android:background="@android:color/holo_blue_light"
                     android:divider="#333232"
                     android:dividerHeight="1dp"
                     android:visibility="visible"
