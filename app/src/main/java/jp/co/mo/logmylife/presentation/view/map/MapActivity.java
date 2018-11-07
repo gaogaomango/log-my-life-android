@@ -2,9 +2,6 @@ package jp.co.mo.logmylife.presentation.view.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,7 +13,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -40,9 +35,7 @@ import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.CopyDialog;
 import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
-import jp.co.mo.logmylife.common.util.RealPathUtil;
 import jp.co.mo.logmylife.domain.entity.map.MapPlaceData;
-import jp.co.mo.logmylife.domain.entity.map.MapPlacePicData;
 import jp.co.mo.logmylife.domain.usecase.MapUseCaseImpl;
 
 public class MapActivity extends AbstractBaseActivity implements GoogleMap.OnMarkerClickListener,
