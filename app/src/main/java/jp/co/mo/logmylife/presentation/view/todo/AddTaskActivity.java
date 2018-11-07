@@ -19,6 +19,7 @@ import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
 import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
+import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
 import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
 
 public class AddTaskActivity extends AbstractBaseActivity implements DatePickerDialog.OnDateSetListener {
@@ -51,7 +52,7 @@ public class AddTaskActivity extends AbstractBaseActivity implements DatePickerD
         // TODO: refuctaring
         mTaskTableHelper = new TaskTableHelper(getApplicationContext(), null, null, 0);
         mIntent = getIntent();
-        mIsUpdate = mIntent.getBooleanExtra(TaskHomeActivity.KEY_IS_UPDATE, false);
+        mIsUpdate = mIntent.getBooleanExtra(TaskDataRepository.KEY_IS_UPDATE, false);
 
         mDateFinal = DateUtil.todayDateString();
         Date yourDate = new Date();
@@ -68,7 +69,7 @@ public class AddTaskActivity extends AbstractBaseActivity implements DatePickerD
 
     private void initUpdate() {
         Logger.debug(TAG, "initUpdate");
-        mId = mIntent.getStringExtra(TaskHomeActivity.KEY_ID);
+        mId = mIntent.getStringExtra(TaskDataRepository.KEY_ID);
         // TODO: change to constant
         mToolbarTaskAddTitle.setText("Update");
 

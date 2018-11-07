@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import jp.co.mo.logmylife.R;
+import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
 
 public class ListTaskAdapter extends BaseAdapter {
 
@@ -59,12 +60,11 @@ public class ListTaskAdapter extends BaseAdapter {
         holder.taskName.setId(position);
         holder.taskDate.setId(position);
 
-        HashMap<String, String> song = new HashMap<>();
-        song = mData.get(position);
+        HashMap<String, String> song = mData.get(position);
 
         try{
-            holder.taskName.setText(song.get(TaskHomeActivity.KEY_TASK));
-            holder.taskDate.setText(song.get(TaskHomeActivity.KEY_DATE));
+            holder.taskName.setText(song.get(TaskDataRepository.KEY_TASK));
+            holder.taskDate.setText(song.get(TaskDataRepository.KEY_DATE));
 
             ColorGenerator generator = ColorGenerator.MATERIAL;
             int color = generator.getColor(getItem(position));

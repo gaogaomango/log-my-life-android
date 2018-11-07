@@ -1,15 +1,10 @@
 package jp.co.mo.logmylife.presentation.view.todo;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
-import android.transition.Explode;
-import android.transition.Slide;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -22,11 +17,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import jp.co.mo.logmylife.AbstractBaseActivity;
 import jp.co.mo.logmylife.R;
-import jp.co.mo.logmylife.common.util.DateUtil;
 import jp.co.mo.logmylife.common.util.Logger;
-import jp.co.mo.logmylife.domain.repository.TaskTableHelper;
-import jp.co.mo.logmylife.presentation.view.main.MainActivity;
-import jp.co.mo.logmylife.presentation.view.map.MapActivity;
+import jp.co.mo.logmylife.domain.repository.TaskDataRepository;
+import jp.co.mo.logmylife.domain.usecase.TaskUsecaseImpl;
 
 public class TaskHomeActivity extends AbstractBaseActivity {
 
@@ -41,16 +34,11 @@ public class TaskHomeActivity extends AbstractBaseActivity {
     @BindView(R.id.tomorrowText) TextView mTomorrowText;
     @BindView(R.id.upcomingText) TextView mUpcomingText;
 
-    private TaskTableHelper mTaskTableHelper;
+    private TaskUsecaseImpl mTaskUsecase;
 
     private ArrayList<HashMap<String, String>> mTodayList = new ArrayList<>();
     private ArrayList<HashMap<String, String>> mTomorrowList = new ArrayList<>();
     private ArrayList<HashMap<String, String>> mUpcomingList = new ArrayList<>();
-
-    public static String KEY_ID = "mId";
-    public static String KEY_TASK = "task";
-    public static String KEY_DATE = "dateStr";
-    public static String KEY_IS_UPDATE = "mIsUpdate";
 
     @Override
     protected  void onCreate(Bundle savedInstanceState) {
@@ -59,8 +47,7 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.task_home);
         ButterKnife.bind(this);
-
-        mTaskTableHelper = new TaskTableHelper(this);
+        mTaskUsecase = new TaskUsecaseImpl(this);
     }
 
     public void openAddTask(View v) {
@@ -70,7 +57,6 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
     public void populateDate() {
         Logger.debug(TAG, "populateDate");
-        mTaskTableHelper = new TaskTableHelper(this);
         mScrollView.setVisibility(View.GONE);
         mLoader.setVisibility(View.VISIBLE);
 
@@ -104,21 +90,11 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            String xml = "";
+            mTaskUsecase.loadTodayDataList(mTodayList);
+            mTaskUsecase.loadTomorrowDataList(mTomorrowList);
+            mTaskUsecase.loadUpcomingDataList(mUpcomingList);
 
-            // TODO: move to usecase and repository;
-            Cursor today = mTaskTableHelper.getDataToday();
-            loadDataList(today, mTodayList);
-
-            // TODO: move to usecase and repository;
-            Cursor tmr = mTaskTableHelper.getDataTomorrow();
-            loadDataList(tmr, mTomorrowList);
-
-            // TODO: move to usecase and repository;
-            Cursor upcoming = mTaskTableHelper.getDataUpcoming();
-            loadDataList(upcoming, mUpcomingList);
-
-            return xml;
+            return null;
         }
 
         @Override
@@ -150,22 +126,6 @@ public class TaskHomeActivity extends AbstractBaseActivity {
 
         }
 
-        private void loadDataList(Cursor cursor, ArrayList<HashMap<String, String>> dataList) {
-            if(cursor == null) {
-                return;
-            }
-
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                HashMap<String, String> mapToday = new HashMap<>();
-                mapToday.put(KEY_ID, cursor.getString(0).toString());
-                mapToday.put(KEY_TASK, cursor.getString(1).toString());
-                mapToday.put(KEY_DATE, DateUtil.Epoch2DateString(cursor.getString(2).toString(), DateUtil.FORMAT_DIVIDE_HYPEHEN_DDMMYYY));
-                dataList.add(mapToday);
-                cursor.moveToNext();
-            }
-        }
-
         private void loadListView(ListView listView, final ArrayList<HashMap<String, String>> dataList) {
             ListTaskAdapter adapter = new ListTaskAdapter(getApplicationContext(), dataList);
             listView.setAdapter(adapter);
@@ -173,8 +133,8 @@ public class TaskHomeActivity extends AbstractBaseActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent i = new Intent(getApplicationContext(), AddTaskActivity.class);
-                    i.putExtra(KEY_IS_UPDATE, true);
-                    i.putExtra(KEY_ID, dataList.get(+position).get(KEY_ID));
+                    i.putExtra(TaskDataRepository.KEY_IS_UPDATE, true);
+                    i.putExtra(TaskDataRepository.KEY_ID, dataList.get(+position).get(TaskDataRepository.KEY_ID));
                     startIntentWithSlideAnimation(TaskHomeActivity.this, i);
                 }
             });
